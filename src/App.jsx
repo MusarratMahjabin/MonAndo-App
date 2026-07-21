@@ -29,7 +29,7 @@ function App() {
     )
   }
 
-  return <Home onEnter={() => setScreen('list')} />
+  return <Home onEnterVR={() => setScreen('list')} />
 }
 
 export default App
