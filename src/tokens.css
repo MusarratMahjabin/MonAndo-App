@@ -1,0 +1,50 @@
+/* ============================================================
+   MonAndo Design Tokens
+   ============================================================
+   This file is the single source of truth for the app's colours
+   and fonts. Change a value here and it updates everywhere that
+   value is used across the app.
+
+   To change a colour: edit the hex code (the #RRGGBB value) after
+   the colon on the line you want to change, then save the file.
+   Don't rename anything before the colon (e.g. "--bg-app") — that
+   name is what the rest of the app looks for.
+   ============================================================ */
+
+:root {
+  /* ---------- Backgrounds ---------- */
+  --bg-app: #f5f1e8; /* warm bone/off-white — the app's main background */
+  --bg-card: #ffffff; /* plain white card surfaces */
+
+  /* ---------- Brand colours ---------- */
+  --navy-deep: #1b3a5c; /* deep navy — used on the hero card only */
+  --blue-accent: #2e5f8a; /* accent blue — used for "One step" in the headline */
+  --olive-deep: #4a5d2f; /* deep olive green — used on the Urban Sansa tile only */
+
+  /* ---------- Tile colours (feature tile backgrounds) ---------- */
+  --tile-terracotta: #e89b7b; /* VR Therapy */
+  --tile-olive: #4a5d2f; /* Urban Sansa (same as --olive-deep) */
+  --tile-teal: #7fbab0; /* Music & ASMR */
+  --tile-periwinkle: #a8a5d9; /* Reflect */
+
+  /* ---------- Text ---------- */
+  --text-headline: #1b3a5c; /* primary headline colour (deep navy) */
+  --text-headline-accent: #2e5f8a; /* accent word in the headline (brighter blue) */
+  --text-ink: #1a1a1a; /* default body text colour */
+  --text-grey: #6b6b6b; /* secondary / muted text */
+  --text-on-dark: #f5f1e8; /* text placed on dark backgrounds (navy hero card, olive tile) */
+
+  /* Supporting tones derived from the brand colours above, used for
+     small details on the navy hero card only */
+  --navy-label: #8fb4d6; /* muted lighter blue for the small label on the hero card */
+  --navy-pill-bg: rgba(0, 0, 0, 0.18); /* translucent pill background on the hero card */
+
+  /* ---------- Fonts ---------- */
+  --serif: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --sans: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* ---------- Grain texture ----------
+     A fine noise pattern (built from an SVG filter, not an image file)
+     used as a subtle overlay on the hero card and feature tiles. */
+  --grain-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
