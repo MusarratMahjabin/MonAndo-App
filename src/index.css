@@ -978,6 +978,7 @@ body {
 .loading-screen {
   position: fixed;
   inset: 0;
+  z-index: 30;
   width: 100vw;
   height: 100vh;
   background: var(--navy);
@@ -1012,4 +1013,331 @@ body {
   font-family: var(--sans);
   font-size: 13.5px;
   color: rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- Pre-Session Check ---------- */
+
+.precheck-screen {
+  min-height: 100vh;
+  background: var(--bg-app);
+  padding: 24px 24px 48px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
+}
+
+.precheck-back {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-headline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(20, 24, 40, 0.08);
+  cursor: pointer;
+  margin-bottom: 22px;
+}
+
+.precheck-step {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-grey);
+  margin-bottom: 10px;
+}
+
+.precheck-headline {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-headline);
+  margin-bottom: 10px;
+}
+
+.precheck-headline em {
+  font-style: italic;
+  color: var(--text-headline-accent);
+}
+
+.precheck-subtitle {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-grey);
+  max-width: 340px;
+  margin-bottom: 24px;
+}
+
+.precheck-begin {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 16px;
+  margin-top: 28px;
+  background: var(--text-headline);
+  color: var(--text-on-dark);
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- Shared SUDS Slider Card (Pre-Check + Session Review) ---------- */
+
+.review-card {
+  background: var(--bg-card);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 2px 10px rgba(20, 24, 40, 0.06);
+  margin-bottom: 22px;
+}
+
+.review-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.review-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--text-grey);
+  text-transform: uppercase;
+}
+
+.review-card-value {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-headline);
+}
+
+.review-card-value-sub {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-grey);
+}
+
+.suds-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #5fcf9f 0%, #f2c94c 50%, #eb6b6b 100%);
+  outline: none;
+  margin: 6px 0 14px;
+  cursor: pointer;
+}
+
+.suds-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #d8d2c4;
+  box-shadow: 0 2px 6px rgba(20, 24, 40, 0.2);
+  cursor: pointer;
+}
+
+.suds-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #d8d2c4;
+  box-shadow: 0 2px 6px rgba(20, 24, 40, 0.2);
+  cursor: pointer;
+}
+
+.suds-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #5fcf9f 0%, #f2c94c 50%, #eb6b6b 100%);
+}
+
+.review-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-grey);
+}
+
+/* ---------- Session Review ---------- */
+
+.review-screen {
+  min-height: 100vh;
+  background: var(--bg-app);
+  padding: 24px 24px 120px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
+}
+
+.review-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-grey);
+  margin-bottom: 10px;
+}
+
+.review-title {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--text-headline);
+  margin-bottom: 2px;
+}
+
+.review-subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--tile-periwinkle);
+  margin-bottom: 22px;
+}
+
+.review-insight {
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, rgba(168, 165, 217, 0.25), rgba(127, 186, 176, 0.25));
+}
+
+.review-insight-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--text-headline-accent);
+  margin-bottom: 10px;
+}
+
+.review-insight-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-ink);
+}
+
+.review-insight-before {
+  color: #c0554f;
+  font-weight: 700;
+}
+
+.review-insight-after {
+  color: #2fa66e;
+  font-weight: 700;
+}
+
+.review-section {
+  margin-bottom: 24px;
+}
+
+.review-section-label {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-ink);
+  margin-bottom: 12px;
+}
+
+.review-stars {
+  display: flex;
+  gap: 10px;
+}
+
+.review-star {
+  border: none;
+  background: transparent;
+  font-size: 30px;
+  line-height: 1;
+  color: #e8e2d0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.review-star-filled {
+  color: #f0b429;
+}
+
+.review-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.review-pill {
+  border: 1.5px solid rgba(26, 26, 26, 0.12);
+  background: var(--bg-card);
+  color: var(--text-ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.review-pill-active {
+  background: var(--text-headline);
+  border-color: var(--text-headline);
+  color: var(--text-on-dark);
+}
+
+.review-badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #fde9bd, #fbd48a);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.review-badge-icon {
+  flex: 0 0 auto;
+  font-size: 28px;
+}
+
+.review-badge-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #8a6a1a;
+  margin-bottom: 2px;
+}
+
+.review-badge-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.review-badge-desc {
+  font-size: 12.5px;
+  color: rgba(26, 26, 26, 0.65);
+}
+
+.review-done {
+  position: fixed;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  border: none;
+  border-radius: 999px;
+  padding: 16px;
+  background: var(--text-headline);
+  color: var(--text-on-dark);
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
 }

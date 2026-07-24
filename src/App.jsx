@@ -2,8 +2,9 @@ import { useState } from 'react'
 import Home from './Home.jsx'
 import VRLibrary from './VRLibrary.jsx'
 import HardwareSelect from './HardwareSelect.jsx'
-import LoadingScreen from './LoadingScreen.jsx'
+import PreCheck from './PreCheck.jsx'
 import VRPractice from './VRPractice.jsx'
+import SessionReview from './SessionReview.jsx'
 import MusicLibrary from './MusicLibrary.jsx'
 import NowPlaying from './NowPlaying.jsx'
 import { useAudioPlayer } from './useAudioPlayer.js'
@@ -12,6 +13,7 @@ function App() {
   const [screen, setScreen] = useState('home')
   const [selectedScenario, setSelectedScenario] = useState(null)
   const [hardwareMode, setHardwareMode] = useState('phone')
+  const [sudsBefore, setSudsBefore] = useState(5)
   const { currentTrack, isPlaying, play } = useAudioPlayer()
 
   const openTrack = (track) => {
@@ -34,19 +36,38 @@ function App() {
     )
   }
 
+  if (screen === 'review' && selectedScenario) {
+    return (
+      <SessionReview
+        scenario={selectedScenario}
+        sudsBefore={sudsBefore}
+        onDone={() => setScreen('home')}
+      />
+    )
+  }
+
   if (screen === 'vr' && selectedScenario) {
     return (
       <VRPractice
         key={selectedScenario.id}
         scenario={selectedScenario}
         mode={hardwareMode}
-        onExit={() => setScreen('list')}
+        onExit={() => setScreen('review')}
       />
     )
   }
 
-  if (screen === 'loading' && selectedScenario) {
-    return <LoadingScreen onLoaded={() => setScreen('vr')} />
+  if (screen === 'precheck' && selectedScenario) {
+    return (
+      <PreCheck
+        scenario={selectedScenario}
+        onBack={() => setScreen('hardware')}
+        onBegin={(suds) => {
+          setSudsBefore(suds)
+          setScreen('vr')
+        }}
+      />
+    )
   }
 
   if (screen === 'hardware' && selectedScenario) {
@@ -55,7 +76,7 @@ function App() {
         onBack={() => setScreen('list')}
         onEnterScene={(mode) => {
           setHardwareMode(mode)
-          setScreen('loading')
+          setScreen('precheck')
         }}
       />
     )

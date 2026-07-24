@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import LoadingScreen from './LoadingScreen.jsx'
 
 function VRPractice({ scenario, mode, onExit }) {
   const videoRef = useRef(null)
@@ -6,9 +7,35 @@ function VRPractice({ scenario, mode, onExit }) {
   const exitEntityRef = useRef(null)
   const [needsTap, setNeedsTap] = useState(false)
   const [needsVRTap, setNeedsVRTap] = useState(false)
+  const [sceneReady, setSceneReady] = useState(false)
 
+  // Show our own themed loading screen (instead of A-Frame's default one)
+  // until the scene has actually finished initializing. The video element
+  // still preloads/buffers in the background this whole time (it just
+  // isn't playing yet), so it's ready to go the instant we reveal it.
   useEffect(() => {
     if (!scenario.videoUrl) return
+
+    const scene = sceneRef.current
+    if (!scene) return
+
+    const markReady = () => setSceneReady(true)
+
+    if (scene.hasLoaded) {
+      markReady()
+    } else {
+      scene.addEventListener('loaded', markReady, { once: true })
+      return () => scene.removeEventListener('loaded', markReady)
+    }
+  }, [scenario.videoUrl])
+
+  // Start playback (video and audio together) at the same moment the
+  // loading screen disappears and the scene becomes visible — not the
+  // instant the video element mounts, which is what the "autoplay" HTML
+  // attribute would otherwise do, causing audio to start under the
+  // loading screen well before the video is actually shown.
+  useEffect(() => {
+    if (!scenario.videoUrl || !sceneReady) return
 
     const video = videoRef.current
     if (!video) return
@@ -22,7 +49,7 @@ function VRPractice({ scenario, mode, onExit }) {
     }
 
     return () => video.removeEventListener('playing', hideOverlay)
-  }, [scenario.videoUrl])
+  }, [scenario.videoUrl, sceneReady])
 
   // VR Headset mode: automatically switch A-Frame into its stereo/VR
   // rendering (side-by-side left/right eye view) for use in a Cardboard-
@@ -99,15 +126,16 @@ function VRPractice({ scenario, mode, onExit }) {
 
   return (
     <div className="vr-screen">
-      <a-scene ref={sceneRef}>
+      {!sceneReady && <LoadingScreen />}
+
+      <a-scene ref={sceneRef} loading-screen="enabled: false">
         <a-assets timeout="10000">
           <video
             id="scenario-video"
             ref={videoRef}
             src={scenario.videoUrl}
-            autoPlay
+            preload="auto"
             loop
-            muted
             playsInline
             webkit-playsinline="true"
             crossOrigin="anonymous"
