@@ -47,4 +47,13 @@
      A fine noise pattern (built from an SVG filter, not an image file)
      used as a subtle overlay on the hero card and feature tiles. */
   --grain-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* ---------- SOS screen ----------
+     Coral/pink is used only on this screen, on purpose — it's kept out
+     of the rest of the app so it reads as unmistakably urgent here. */
+  --sos-bg-top: #fce3db;
+  --sos-bg-bottom: #fdf3ef;
+  --sos-coral: #f2705c;
+  --sos-coral-soft: rgba(242, 112, 92, 0.16);
+  --sos-lavender: #8b85d6;
 }

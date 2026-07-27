@@ -91,6 +91,26 @@ function VRPractice({ scenario, mode, onExit }) {
     return () => entity.removeEventListener('click', onExit)
   }, [mode, onExit])
 
+  // Safety net: A-Frame adds a class ("a-fullscreen") to <html> when
+  // entering VR mode, whose CSS locks page scrolling. It doesn't reliably
+  // remove that class again once VR mode ends, which freezes every screen
+  // shown afterward. Force it off whenever this screen goes away, no
+  // matter how the user got out (exit button, gaze control, or the
+  // browser's own back gesture).
+  useEffect(() => {
+    return () => {
+      const scene = sceneRef.current
+      if (scene?.exitVR) scene.exitVR()
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {})
+      }
+      document.documentElement.classList.remove('a-fullscreen')
+      document.body.classList.remove('a-fullscreen')
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   const handleTap = () => {
     const video = videoRef.current
     if (video) video.play()

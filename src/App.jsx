@@ -7,6 +7,8 @@ import VRPractice from './VRPractice.jsx'
 import SessionReview from './SessionReview.jsx'
 import MusicLibrary from './MusicLibrary.jsx'
 import NowPlaying from './NowPlaying.jsx'
+import UrbanSansa from './UrbanSansa.jsx'
+import SOS from './SOS.jsx'
 import { useAudioPlayer } from './useAudioPlayer.js'
 
 function App() {
@@ -14,15 +16,30 @@ function App() {
   const [selectedScenario, setSelectedScenario] = useState(null)
   const [hardwareMode, setHardwareMode] = useState('phone')
   const [sudsBefore, setSudsBefore] = useState(5)
+  const [nowPlayingReturn, setNowPlayingReturn] = useState('music')
   const { currentTrack, isPlaying, play } = useAudioPlayer()
 
-  const openTrack = (track) => {
+  const openTrack = (track, returnScreen = 'music') => {
     play(track)
+    setNowPlayingReturn(returnScreen)
     setScreen('nowplaying')
   }
 
   if (screen === 'nowplaying' && currentTrack) {
-    return <NowPlaying track={currentTrack} onCollapse={() => setScreen('music')} />
+    return <NowPlaying track={currentTrack} onCollapse={() => setScreen(nowPlayingReturn)} />
+  }
+
+  if (screen === 'sos') {
+    return <SOS onBack={() => setScreen('home')} />
+  }
+
+  if (screen === 'urbansansa') {
+    return (
+      <UrbanSansa
+        onBack={() => setScreen('home')}
+        onOpenFeature={(feature) => openTrack(feature, 'urbansansa')}
+      />
+    )
   }
 
   if (screen === 'music') {
@@ -95,7 +112,12 @@ function App() {
   }
 
   return (
-    <Home onEnterVR={() => setScreen('list')} onOpenMusic={() => setScreen('music')} />
+    <Home
+      onEnterVR={() => setScreen('list')}
+      onOpenMusic={() => setScreen('music')}
+      onOpenUrbanSansa={() => setScreen('urbansansa')}
+      onOpenSOS={() => setScreen('sos')}
+    />
   )
 }
 

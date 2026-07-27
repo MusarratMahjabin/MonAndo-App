@@ -11,7 +11,7 @@ function HamburgerIcon() {
   )
 }
 
-function Home({ onEnterVR, onOpenMusic }) {
+function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenSOS }) {
   return (
     <div className="home2-screen">
       <div className="home2-topbar">
@@ -20,6 +20,12 @@ function Home({ onEnterVR, onOpenMusic }) {
           <HamburgerIcon />
         </button>
       </div>
+
+      {/* Temporary stand-in for the real SOS entry point, which belongs
+          in the bottom nav bar once that's built. */}
+      <button className="home2-sos-fab" type="button" onClick={onOpenSOS}>
+        SOS
+      </button>
 
       <h1 className="home2-headline">
         Let's begin
@@ -63,11 +69,15 @@ function Home({ onEnterVR, onOpenMusic }) {
           <div className="home2-tile-sub">Calming soundscapes</div>
         </button>
 
-        <div className="home2-tile grain home2-tile-olive">
+        <button
+          className="home2-tile grain home2-tile-olive"
+          type="button"
+          onClick={onOpenUrbanSansa}
+        >
           <span className="home2-tile-icon">🏙️</span>
           <div className="home2-tile-title">Urban Sansa</div>
           <div className="home2-tile-sub">Your own temple in the city</div>
-        </div>
+        </button>
 
         <div className="home2-tile grain home2-tile-periwinkle">
           <span className="home2-tile-icon">💬</span>
