@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// ============================================================
+// MonAndo Firestore Security Rules
+// ============================================================
+// Every user's data lives under /users/{their own uid}/... — sessions,
+// badges, trusted contact, and mood check-ins. This rule says: you may
+// only read or write documents under YOUR OWN uid, and never anyone
+// else's. Since everyone signs in anonymously, "your uid" just means
+// "this device's anonymous account."
+//
+// HOW TO APPLY THIS:
+//   1. Go to the Firebase Console → your project → Firestore Database
+//      → the "Rules" tab.
+//   2. Replace whatever is there with the contents of this file.
+//   3. Click "Publish".
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

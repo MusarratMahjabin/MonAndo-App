@@ -113,17 +113,6 @@ const scenarios = [
     aiContext: 'The user is standing inside a moving, moderately crowded public city bus, holding onto a handrail while passengers board and disembark at various stops.',
   },
   {
-    id: 'crowded-street',
-    title: 'Crowded Street',
-    category: 'Public Spaces',
-    difficulty: 'Medium',
-    durationMinutes: 8,
-    emoji: '🏙️',
-    thumbnailUrl: '',
-    videoUrl: '',
-    aiContext: 'The user is navigating through a bustling downtown pedestrian street during rush hour, surrounded by people walking quickly in all directions and ambient city noise.',
-  },
-  {
     id: 'job-interview',
     title: 'Job Interview',
     category: 'Professional',
@@ -144,7 +133,18 @@ const scenarios = [
     thumbnailUrl: 'https://res.cloudinary.com/lszcugmx/image/upload/v1784828871/IMG_8683_dmbqdy.png',
     videoUrl: 'https://res.cloudinary.com/lszcugmx/video/upload/q_auto/v1784829138/Relax_com25_d4jqg5.mp4',
     aiContext: 'The user is resting in a peaceful, lush green forest clearing near a gentle stream, surrounded by calming nature sounds, birdsong, and soft sunlight.',
-  }
+  },
+  {
+    id: 'crowded-street',
+    title: 'Crowded Street',
+    category: 'Public Spaces',
+    difficulty: 'Medium',
+    durationMinutes: 5,
+    emoji: '🏙️',
+    thumbnailUrl: 'https://res.cloudinary.com/lszcugmx/image/upload/v1784899110/IMG_8689_t4jntg.png',
+    videoUrl: '',
+    aiContext: 'The user is navigating through a bustling downtown pedestrian street during rush hour, surrounded by people walking quickly in all directions and ambient city noise.',
+  },
 ]
 
 export default scenarios

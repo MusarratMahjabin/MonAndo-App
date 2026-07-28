@@ -11,7 +11,7 @@ function HamburgerIcon() {
   )
 }
 
-function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenSOS }) {
+function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenSOS, onOpenCheckIn }) {
   return (
     <div className="home2-screen">
       <div className="home2-topbar">
@@ -33,6 +33,10 @@ function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenSOS }) {
         with <span className="home2-headline-accent">One step</span>
       </h1>
       <p className="home2-subtitle">Well begun is half done.</p>
+
+      <button className="home2-checkin-link" type="button" onClick={onOpenCheckIn}>
+        How are you feeling today? →
+      </button>
 
       <button className="home2-pick-card grain" type="button" onClick={onEnterVR}>
         <div className="home2-pick-label">✦ NOW RECOMMENDED</div>

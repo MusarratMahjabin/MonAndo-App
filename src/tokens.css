@@ -42,6 +42,7 @@
   /* ---------- Fonts ---------- */
   --serif: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
   --sans: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --script: 'Caveat', 'Segoe Script', cursive; /* handwritten feel — Welcome screen only */
 
   /* ---------- Grain texture ----------
      A fine noise pattern (built from an SVG filter, not an image file)
@@ -56,4 +57,17 @@
   --sos-coral: #f2705c;
   --sos-coral-soft: rgba(242, 112, 92, 0.16);
   --sos-lavender: #8b85d6;
+
+  /* ---------- Welcome screen ----------
+     A dark, cosmic exception to the rest of the app's cream palette —
+     this is the very first thing a new user sees. */
+  --welcome-bg-1: #181425;
+  --welcome-bg-2: #2c2049;
+  --welcome-bg-3: #1c1730;
+  --welcome-orb-blue-1: #cdeef8;
+  --welcome-orb-blue-2: #5a8fd6;
+  --welcome-orb-pink-1: #f6cdec;
+  --welcome-orb-pink-2: #a374d1;
+  --welcome-accent: #b9a6e8;
+  --welcome-text-muted: #a99fc4;
 }

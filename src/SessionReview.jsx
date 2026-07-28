@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getSessions, saveSession, BADGES } from './sessionStore.js'
 
 const HELPER_OPTIONS = ['AI voice', 'Breathing', "Knowing it's VR", 'Repeating']
@@ -22,9 +22,23 @@ function StarRating({ value, onChange }) {
 }
 
 function SessionReview({ scenario, sudsBefore, onDone }) {
-  // Read once on mount — this session hasn't been saved yet, so an empty
-  // history here means it's about to become the user's first.
-  const isFirstSession = useMemo(() => getSessions().length === 0, [])
+  // This session hasn't been saved yet, so an empty history here means
+  // it's about to become the user's first. Loaded from Firestore, so it
+  // starts false and pops in once we know for sure.
+  const [isFirstSession, setIsFirstSession] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    getSessions()
+      .then((sessions) => {
+        if (!cancelled) setIsFirstSession(sessions.length === 0)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const [sudsAfter, setSudsAfter] = useState(sudsBefore)
   const [rating, setRating] = useState(0)
@@ -40,17 +54,22 @@ function SessionReview({ scenario, sudsBefore, onDone }) {
   const reduction =
     sudsBefore > 0 ? Math.round(((sudsBefore - sudsAfter) / sudsBefore) * 100) : 0
 
-  const handleDone = () => {
-    saveSession({
-      id: Date.now(),
-      scenarioId: scenario.id,
-      scenarioTitle: scenario.title,
-      date: new Date().toISOString(),
-      sudsBefore,
-      sudsAfter,
-      rating,
-      helpers,
-    })
+  const handleDone = async () => {
+    setSaving(true)
+    try {
+      await saveSession({
+        id: Date.now(),
+        scenarioId: scenario.id,
+        scenarioTitle: scenario.title,
+        date: new Date().toISOString(),
+        sudsBefore,
+        sudsAfter,
+        rating,
+        helpers,
+      })
+    } catch (err) {
+      console.error('Failed to save session:', err)
+    }
     onDone()
   }
 
@@ -130,8 +149,13 @@ function SessionReview({ scenario, sudsBefore, onDone }) {
         </div>
       )}
 
-      <button className="review-done" type="button" onClick={handleDone}>
-        See my progress
+      <button
+        className="review-done"
+        type="button"
+        disabled={saving}
+        onClick={handleDone}
+      >
+        {saving ? 'Saving…' : 'See my progress'}
       </button>
     </div>
   )

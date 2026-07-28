@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getInitialUser } from './firebase.js'
+import { migrateLocalDataToFirestore } from './migrateLocalData.js'
+import Welcome from './Welcome.jsx'
 import Home from './Home.jsx'
 import VRLibrary from './VRLibrary.jsx'
 import HardwareSelect from './HardwareSelect.jsx'
@@ -9,9 +12,12 @@ import MusicLibrary from './MusicLibrary.jsx'
 import NowPlaying from './NowPlaying.jsx'
 import UrbanSansa from './UrbanSansa.jsx'
 import SOS from './SOS.jsx'
+import CheckIn from './CheckIn.jsx'
 import { useAudioPlayer } from './useAudioPlayer.js'
 
 function App() {
+  const [authChecked, setAuthChecked] = useState(false)
+  const [signedIn, setSignedIn] = useState(false)
   const [screen, setScreen] = useState('home')
   const [selectedScenario, setSelectedScenario] = useState(null)
   const [hardwareMode, setHardwareMode] = useState('phone')
@@ -19,10 +25,39 @@ function App() {
   const [nowPlayingReturn, setNowPlayingReturn] = useState('music')
   const { currentTrack, isPlaying, play } = useAudioPlayer()
 
+  // Check once whether this device already has a signed-in session (Guest
+  // or Google) from a previous visit. If so, skip straight past Welcome.
+  // The first time a session is found, also copy over anything saved in
+  // this browser's old localStorage before the app moved to Firestore.
+  useEffect(() => {
+    getInitialUser()
+      .then((user) => {
+        setSignedIn(!!user)
+        setAuthChecked(true)
+        if (user) {
+          migrateLocalDataToFirestore(user.uid).catch((err) =>
+            console.error('Migration failed:', err),
+          )
+        }
+      })
+      .catch((err) => {
+        console.error('Firebase startup failed:', err)
+        setAuthChecked(true)
+      })
+  }, [])
+
   const openTrack = (track, returnScreen = 'music') => {
     play(track)
     setNowPlayingReturn(returnScreen)
     setScreen('nowplaying')
+  }
+
+  if (!authChecked) {
+    return <div className="app-boot" />
+  }
+
+  if (!signedIn) {
+    return <Welcome onSignedIn={() => setSignedIn(true)} />
   }
 
   if (screen === 'nowplaying' && currentTrack) {
@@ -31,6 +66,15 @@ function App() {
 
   if (screen === 'sos') {
     return <SOS onBack={() => setScreen('home')} />
+  }
+
+  if (screen === 'checkin') {
+    return (
+      <CheckIn
+        onClose={() => setScreen('home')}
+        onContinue={(mood) => setScreen(mood === 'crisis' ? 'sos' : 'home')}
+      />
+    )
   }
 
   if (screen === 'urbansansa') {
@@ -117,6 +161,7 @@ function App() {
       onOpenMusic={() => setScreen('music')}
       onOpenUrbanSansa={() => setScreen('urbansansa')}
       onOpenSOS={() => setScreen('sos')}
+      onOpenCheckIn={() => setScreen('checkin')}
     />
   )
 }

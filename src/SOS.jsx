@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import emergencyContacts from './emergencyContacts.js'
+import { getTrustedContact, saveTrustedContact } from './trustedContact.js'
 
 function BackChevron() {
   return (
@@ -64,7 +66,88 @@ function ChatIcon() {
   )
 }
 
+function TrustedContactForm({ initial, onSave, onCancel }) {
+  const [name, setName] = useState(initial?.name || '')
+  const [phone, setPhone] = useState(initial?.phone || '')
+
+  const canSave = name.trim() !== '' && phone.trim() !== ''
+
+  return (
+    <div className="sos-modal-backdrop" onClick={onCancel}>
+      <div className="sos-modal" onClick={(e) => e.stopPropagation()}>
+        <h2 className="sos-modal-title">Trusted contact</h2>
+        <p className="sos-modal-subtitle">
+          Someone you can call quickly in an emergency — a friend, family
+          member, or anyone you trust.
+        </p>
+
+        <label className="sos-modal-label" htmlFor="trusted-name">
+          Name
+        </label>
+        <input
+          id="trusted-name"
+          className="sos-modal-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Mom"
+        />
+
+        <label className="sos-modal-label" htmlFor="trusted-phone">
+          Phone number
+        </label>
+        <input
+          id="trusted-phone"
+          className="sos-modal-input"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="e.g. +8801234567890"
+          type="tel"
+        />
+
+        <div className="sos-modal-actions">
+          <button className="sos-modal-cancel" type="button" onClick={onCancel}>
+            Cancel
+          </button>
+          <button
+            className="sos-modal-save"
+            type="button"
+            disabled={!canSave}
+            onClick={() => onSave({ name: name.trim(), phone: phone.trim() })}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function SOS({ onBack }) {
+  const [trustedContact, setTrustedContact] = useState(null)
+  const [showForm, setShowForm] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    getTrustedContact()
+      .then((contact) => {
+        if (!cancelled) setTrustedContact(contact)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const handleSaveContact = async (contact) => {
+    try {
+      await saveTrustedContact(contact)
+      setTrustedContact(contact)
+    } catch (err) {
+      console.error('Failed to save trusted contact:', err)
+    }
+    setShowForm(false)
+  }
+
   return (
     <div className="sos-screen">
       <button className="sos-back" type="button" onClick={onBack} aria-label="Back">
@@ -118,6 +201,26 @@ function SOS({ onBack }) {
             )}
           </div>
         ))}
+
+        {trustedContact && (
+          <div className="sos-contact-card">
+            <span className="sos-contact-icon" style={{ background: '#8B85D6' }}>
+              <PhoneIcon />
+            </span>
+            <div className="sos-contact-info">
+              <div className="sos-contact-country">YOUR TRUSTED CONTACT</div>
+              <div className="sos-contact-name">{trustedContact.name}</div>
+              <div className="sos-contact-detail">{trustedContact.phone}</div>
+            </div>
+            <a
+              className="sos-contact-action sos-contact-action-solid"
+              style={{ background: '#8B85D6' }}
+              href={`tel:${trustedContact.phone}`}
+            >
+              Call
+            </a>
+          </div>
+        )}
       </div>
 
       <div className="sos-quick-row">
@@ -129,10 +232,18 @@ function SOS({ onBack }) {
         >
           <PinIcon /> Nearby support
         </a>
-        <button className="sos-quick-pill" type="button">
-          <ChatIcon /> Trusted contact
+        <button className="sos-quick-pill" type="button" onClick={() => setShowForm(true)}>
+          <ChatIcon /> {trustedContact ? 'Edit contact' : 'Trusted contact'}
         </button>
       </div>
+
+      {showForm && (
+        <TrustedContactForm
+          initial={trustedContact}
+          onSave={handleSaveContact}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
     </div>
   )
 }
