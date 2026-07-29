@@ -1,7 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import LoadingScreen from './LoadingScreen.jsx'
 
-function VRPractice({ scenario, mode, onExit }) {
+const COMPANION_INTERVAL_MS = 60_000
+
+// ElevenLabs voice used for the AI companion's spoken lines. "Sarah"
+// (Mature, Reassuring, Confident) — one of this account's actual premade
+// voices, which works on the free plan. The originally-requested voice
+// (aGb0TwKthRLQTPThYRqI, "Nila") is saved to this account but is a
+// "professional" category voice, which ElevenLabs blocks from API access
+// on free accounts ("Free users cannot use library voices via the API").
+// Swap this back to aGb0TwKthRLQTPThYRqI if the ElevenLabs plan gets
+// upgraded.
+const COMPANION_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'
+
+function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
   const videoRef = useRef(null)
   const sceneRef = useRef(null)
   const exitEntityRef = useRef(null)
@@ -50,6 +62,113 @@ function VRPractice({ scenario, mode, onExit }) {
 
     return () => video.removeEventListener('playing', hideOverlay)
   }, [scenario.videoUrl, sceneReady])
+
+  // AI voice companion: ask for one short supportive line, right away
+  // once the scene is visible and then again roughly once a minute for
+  // the rest of the session, then speak it out loud via ElevenLabs. If
+  // the model flags the moment instead of returning a line, exit straight
+  // to SOS rather than staying in the scene.
+  useEffect(() => {
+    if (!scenario.videoUrl || !sceneReady) return
+
+    let cancelled = false
+    let currentAudio = null
+
+    const speakAloud = async (text) => {
+      try {
+        const response = await fetch('/api/elevenlabs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, voiceId: COMPANION_VOICE_ID }),
+        })
+        if (!response.ok || cancelled) return
+
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        if (cancelled) {
+          URL.revokeObjectURL(url)
+          return
+        }
+
+        // Only one companion line should ever be audible at once — stop
+        // whatever's still playing before starting the next one.
+        if (currentAudio) {
+          currentAudio.pause()
+          URL.revokeObjectURL(currentAudio.src)
+        }
+        currentAudio = new Audio(url)
+        currentAudio.play().catch((err) => console.error('Could not play companion audio:', err))
+      } catch (err) {
+        console.error('ElevenLabs request failed:', err)
+      }
+    }
+
+    const speak = async () => {
+      const video = videoRef.current
+      if (!video) return
+
+      const elapsedSeconds = video.currentTime
+      const totalSeconds = Math.max(scenario.durationMinutes, 1) * 60
+      const phase =
+        elapsedSeconds < 60 ? 'opening' : totalSeconds - elapsedSeconds <= 60 ? 'closing' : 'middle'
+
+      // Guaranteed backup for the opening/closing moments only, used when
+      // the live AI call itself fails (offline, API down, etc). Mid-session
+      // has no fallback — it's only ever the live, context-aware line.
+      const speakFallback = () => {
+        const fallback = scenario.aiFallbackLines?.[phase]
+        if (fallback) {
+          console.log('[AI companion] (fallback)', fallback)
+          speakAloud(fallback)
+        }
+      }
+
+      try {
+        const response = await fetch('/api/companion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scenarioTitle: scenario.title,
+            scenarioContext: scenario.aiContext,
+            difficulty: scenario.difficulty,
+            elapsedSeconds,
+            durationMinutes: scenario.durationMinutes,
+          }),
+        })
+        if (!response.ok) {
+          speakFallback()
+          return
+        }
+        const data = await response.json()
+        if (cancelled) return
+
+        if (data.flagged) {
+          console.log('[AI companion] flagged this moment — routing to SOS instead of a voice line')
+          onFlagDistress?.()
+          return
+        }
+        if (data.line) {
+          console.log('[AI companion]', data.line)
+          speakAloud(data.line)
+        }
+      } catch (err) {
+        console.error('AI companion request failed:', err)
+        if (!cancelled) speakFallback()
+      }
+    }
+
+    speak()
+    const interval = setInterval(speak, COMPANION_INTERVAL_MS)
+
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+      if (currentAudio) {
+        currentAudio.pause()
+        URL.revokeObjectURL(currentAudio.src)
+      }
+    }
+  }, [scenario, sceneReady, onFlagDistress])
 
   // VR Headset mode: automatically switch A-Frame into its stereo/VR
   // rendering (side-by-side left/right eye view) for use in a Cardboard-

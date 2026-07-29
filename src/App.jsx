@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getInitialUser } from './firebase.js'
 import { migrateLocalDataToFirestore } from './migrateLocalData.js'
 import Welcome from './Welcome.jsx'
+import ProfileSetup from './ProfileSetup.jsx'
 import Home from './Home.jsx'
 import VRLibrary from './VRLibrary.jsx'
 import HardwareSelect from './HardwareSelect.jsx'
@@ -26,15 +27,19 @@ function App() {
   const { currentTrack, isPlaying, play } = useAudioPlayer()
 
   // Check once whether this device already has a signed-in session (Guest
-  // or Google) from a previous visit. If so, skip straight past Welcome.
-  // The first time a session is found, also copy over anything saved in
-  // this browser's old localStorage before the app moved to Firestore.
+  // or Google) from a previous visit. Returning users go straight to the
+  // mood check-in — they've already done Welcome and profile setup before.
+  // Brand new sign-ins go to profile setup first (handled in Welcome's
+  // onSignedIn below). The first time a session is found, also copy over
+  // anything saved in this browser's old localStorage before the app
+  // moved to Firestore.
   useEffect(() => {
     getInitialUser()
       .then((user) => {
         setSignedIn(!!user)
         setAuthChecked(true)
         if (user) {
+          setScreen('checkin')
           migrateLocalDataToFirestore(user.uid).catch((err) =>
             console.error('Migration failed:', err),
           )
@@ -57,7 +62,18 @@ function App() {
   }
 
   if (!signedIn) {
-    return <Welcome onSignedIn={() => setSignedIn(true)} />
+    return (
+      <Welcome
+        onSignedIn={() => {
+          setSignedIn(true)
+          setScreen('profile')
+        }}
+      />
+    )
+  }
+
+  if (screen === 'profile') {
+    return <ProfileSetup onDone={() => setScreen('checkin')} />
   }
 
   if (screen === 'nowplaying' && currentTrack) {
@@ -114,6 +130,7 @@ function App() {
         scenario={selectedScenario}
         mode={hardwareMode}
         onExit={() => setScreen('review')}
+        onFlagDistress={() => setScreen('sos')}
       />
     )
   }
