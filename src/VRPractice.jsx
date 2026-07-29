@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import LoadingScreen from './LoadingScreen.jsx'
 
-const COMPANION_INTERVAL_MS = 60_000
+// Lines are spoken this often, with a little natural variance rather than
+// a rigid, machine-precise beat.
+const COMPANION_MIN_INTERVAL_MS = 50_000
+const COMPANION_MAX_INTERVAL_MS = 60_000
 
 // ElevenLabs voice used for the AI companion's spoken lines. "Sarah"
 // (Mature, Reassuring, Confident) — one of this account's actual premade
@@ -95,105 +98,60 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
     return () => video.removeEventListener('playing', hideOverlay)
   }, [scenario.videoUrl, sceneReady])
 
-  // AI voice companion: ask for one short supportive line, right away
-  // once the scene is visible and then again roughly once a minute for
-  // the rest of the session, then speak it out loud via ElevenLabs. If
-  // the model flags the moment instead of returning a line, exit straight
-  // to SOS rather than staying in the scene.
+  // AI voice companion: speaks one short supportive line right away, then
+  // again every 50-60s for the rest of the session, tone evolving through
+  // the opening/middle/closing phases. While each line is playing, the
+  // NEXT line is already being generated in the background (text + audio),
+  // so there's no generation delay — no silent gap — when its turn comes.
+  // If the model flags the moment instead of returning a line, exit
+  // straight to SOS rather than staying in the scene.
   useEffect(() => {
     if (!scenario.videoUrl || !sceneReady) return
 
     let cancelled = false
     let currentAudio = null
+    let timerId = null
+    let preparedNext = null // a Promise for the line after the one about to play
+
+    // Only one companion voice should ever be audible at once — stop
+    // whichever mechanism (ElevenLabs audio or the browser voice) is
+    // currently going before starting the next line.
+    const stopAnyPlayback = () => {
+      if (currentAudio) {
+        currentAudio.pause()
+        URL.revokeObjectURL(currentAudio.src)
+        currentAudio = null
+      }
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel()
+    }
 
     // Last resort: the browser's own built-in voice, used once both the
     // live Gemini call and the ElevenLabs call have failed or timed out.
     const speakWithBrowserTTS = (text) => {
       if (cancelled || !('speechSynthesis' in window)) return
       console.log('[AI companion] (browser voice fallback)', text)
-      window.speechSynthesis.cancel()
+      stopAnyPlayback()
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.rate = 0.95
       window.speechSynthesis.speak(utterance)
     }
 
-    const speakAloud = async (text) => {
-      try {
-        const response = await fetchWithTimeout(
-          '/api/elevenlabs',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, voiceId: COMPANION_VOICE_ID }),
-          },
-          COMPANION_FETCH_TIMEOUT_MS,
-        )
-        if (cancelled) return
-        if (!response.ok) {
-          const errBody = await response.text().catch(() => '')
-          console.error('ElevenLabs request failed:', response.status, errBody)
-          speakWithBrowserTTS(pickBackupLine())
-          return
-        }
-
-        const blob = await response.blob()
-        const url = URL.createObjectURL(blob)
-        if (cancelled) {
-          URL.revokeObjectURL(url)
-          return
-        }
-
-        // Only one companion line should ever be audible at once — stop
-        // whatever's still playing before starting the next one.
-        if (currentAudio) {
-          currentAudio.pause()
-          URL.revokeObjectURL(currentAudio.src)
-        }
-        const audio = new Audio(url)
-        currentAudio = audio
-
-        // Mobile browsers often block a play() call that happens at the
-        // end of an async chain like this one, even though the session
-        // itself started from a real tap. If that happens, don't just
-        // give up — try again the instant the user next taps anywhere,
-        // which mobile browsers do treat as a fresh, valid gesture.
-        audio.play().catch((err) => {
-          console.error('Could not play companion audio, will retry on next tap:', err)
-          const retryPlay = () => {
-            if (currentAudio === audio && !cancelled) audio.play().catch(() => {})
-          }
-          document.addEventListener('pointerdown', retryPlay, { once: true })
-        })
-      } catch (err) {
-        console.error('ElevenLabs request failed:', err)
-        speakWithBrowserTTS(pickBackupLine())
-      }
-    }
-
-    const speak = async () => {
-      const video = videoRef.current
-      if (!video) return
-
-      const elapsedSeconds = video.currentTime
+    // Fetches (but does not play) one line: the live Gemini text if it
+    // succeeds, the scenario's opening/closing fallback text if Gemini
+    // fails, or a signal to use the browser-voice backup if neither is
+    // available — then, for real text, fetches its ElevenLabs audio too.
+    // `elapsedSeconds` is the point in the session this line is FOR, which
+    // for pre-generated lines is an estimate of when it'll actually play,
+    // not the moment it's being generated — so the tone (opening/middle/
+    // closing) matches when it's heard, not when it was fetched.
+    const prepareLine = async (elapsedSeconds) => {
       const totalSeconds = Math.max(scenario.durationMinutes, 1) * 60
       const phase =
         elapsedSeconds < 60 ? 'opening' : totalSeconds - elapsedSeconds <= 60 ? 'closing' : 'middle'
 
-      // Guaranteed backup, used whenever the live Gemini call itself fails
-      // or times out. Opening/closing get the scenario-specific line (still
-      // routed through ElevenLabs, which has its own browser-voice backup
-      // if that fails too); mid-session has no scenario-specific line, so
-      // it goes straight to the browser-voice backup. Either way, the
-      // companion never goes completely silent.
-      const speakFallback = () => {
-        const fallback = scenario.aiFallbackLines?.[phase]
-        if (fallback) {
-          console.log('[AI companion] (fallback)', fallback)
-          speakAloud(fallback)
-        } else {
-          speakWithBrowserTTS(pickBackupLine())
-        }
-      }
+      let text = null
+      let isFallback = false
+      let flagged = false
 
       try {
         const response = await fetchWithTimeout(
@@ -211,39 +169,113 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
           },
           COMPANION_FETCH_TIMEOUT_MS,
         )
-        if (!response.ok) {
-          speakFallback()
-          return
-        }
-        const data = await response.json()
-        if (cancelled) return
-
-        if (data.flagged) {
-          console.log('[AI companion] flagged this moment — routing to SOS instead of a voice line')
-          onFlagDistress?.()
-          return
-        }
-        if (data.line) {
-          console.log('[AI companion]', data.line)
-          speakAloud(data.line)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.flagged) flagged = true
+          else if (data.line) text = data.line
+        } else {
+          console.error('AI companion request failed:', response.status)
         }
       } catch (err) {
         console.error('AI companion request failed:', err)
-        if (!cancelled) speakFallback()
+      }
+
+      if (flagged) return { type: 'flag' }
+
+      // Guaranteed backup, used whenever the live Gemini call itself fails
+      // or times out. Opening/closing get the scenario-specific line;
+      // mid-session has no scenario-specific line, so it goes straight to
+      // the browser-voice backup. Either way, the companion never goes
+      // completely silent.
+      if (!text) {
+        text = scenario.aiFallbackLines?.[phase]
+        isFallback = true
+      }
+      if (!text) return { type: 'browser', text: pickBackupLine() }
+
+      try {
+        const response = await fetchWithTimeout(
+          '/api/elevenlabs',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, voiceId: COMPANION_VOICE_ID }),
+          },
+          COMPANION_FETCH_TIMEOUT_MS,
+        )
+        if (!response.ok) {
+          const errBody = await response.text().catch(() => '')
+          console.error('ElevenLabs request failed:', response.status, errBody)
+          return { type: 'browser', text: pickBackupLine() }
+        }
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        return { type: 'audio', url, text, isFallback }
+      } catch (err) {
+        console.error('ElevenLabs request failed:', err)
+        return { type: 'browser', text: pickBackupLine() }
       }
     }
 
-    speak()
-    const interval = setInterval(speak, COMPANION_INTERVAL_MS)
+    const playPrepared = (prepared) => {
+      if (cancelled || !prepared) return
+
+      if (prepared.type === 'flag') {
+        console.log('[AI companion] flagged this moment — routing to SOS instead of a voice line')
+        onFlagDistress?.()
+        return
+      }
+
+      if (prepared.type === 'browser') {
+        speakWithBrowserTTS(prepared.text)
+        return
+      }
+
+      console.log(prepared.isFallback ? '[AI companion] (fallback)' : '[AI companion]', prepared.text)
+      stopAnyPlayback()
+      const audio = new Audio(prepared.url)
+      currentAudio = audio
+
+      // Mobile browsers often block a play() call that happens at the end
+      // of an async chain like this one, even though the session itself
+      // started from a real tap. If that happens, don't just give up —
+      // try again the instant the user next taps anywhere, which mobile
+      // browsers do treat as a fresh, valid gesture.
+      audio.play().catch((err) => {
+        console.error('Could not play companion audio, will retry on next tap:', err)
+        const retryPlay = () => {
+          if (currentAudio === audio && !cancelled) audio.play().catch(() => {})
+        }
+        document.addEventListener('pointerdown', retryPlay, { once: true })
+      })
+    }
+
+    const cycle = async () => {
+      if (cancelled) return
+      const video = videoRef.current
+      const nowElapsed = video ? video.currentTime : 0
+
+      const prepared = preparedNext ? await preparedNext : await prepareLine(nowElapsed)
+      preparedNext = null
+      if (cancelled) return
+
+      playPrepared(prepared)
+      if (prepared?.type === 'flag') return
+
+      // Start generating the FOLLOWING line right away, while this one is
+      // still playing, aimed at roughly when it'll actually be needed.
+      const delay =
+        COMPANION_MIN_INTERVAL_MS + Math.random() * (COMPANION_MAX_INTERVAL_MS - COMPANION_MIN_INTERVAL_MS)
+      preparedNext = prepareLine(nowElapsed + delay / 1000)
+      timerId = setTimeout(cycle, delay)
+    }
+
+    cycle()
 
     return () => {
       cancelled = true
-      clearInterval(interval)
-      if (currentAudio) {
-        currentAudio.pause()
-        URL.revokeObjectURL(currentAudio.src)
-      }
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel()
+      if (timerId) clearTimeout(timerId)
+      stopAnyPlayback()
     }
   }, [scenario, sceneReady, onFlagDistress])
 
