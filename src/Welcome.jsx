@@ -40,10 +40,7 @@ function Welcome({ onSignedIn }) {
       onSignedIn()
     } catch (err) {
       console.error('Google sign-in failed:', err)
-      // Temporarily showing the real error code on screen (not just a
-      // generic message) so this can be diagnosed without needing to
-      // open developer tools on a phone.
-      setError(`Couldn't sign in with Google — ${err.code || err.message || 'unknown error'}`)
+      setError("Couldn't sign in with Google — please try again.")
       setLoading(false)
     }
   }
