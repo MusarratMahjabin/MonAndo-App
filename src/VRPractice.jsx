@@ -13,6 +13,38 @@ const COMPANION_INTERVAL_MS = 60_000
 // upgraded.
 const COMPANION_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'
 
+// How long to wait for the Gemini or ElevenLabs calls before treating them
+// as failed, so a hung request can't leave the companion silent for the
+// rest of the session.
+const COMPANION_FETCH_TIMEOUT_MS = 8_000
+
+// Last-resort lines read by the browser's own built-in speechSynthesis —
+// used only once both the live Gemini call AND the ElevenLabs call have
+// failed or timed out. Written by hand (not AI-generated), so they're
+// guaranteed to already follow the companion's rules: present-moment,
+// non-clinical, under 15 words. The companion should never go completely
+// silent during a session, even offline.
+const BROWSER_TTS_BACKUP_LINES = [
+  "Take a slow breath. You're here, and that's enough right now.",
+  "Notice your feet on the ground. You're doing just fine.",
+  "This moment doesn't ask anything of you. Just breathe.",
+  "You're still here, still steady. That counts for something.",
+]
+
+function pickBackupLine() {
+  return BROWSER_TTS_BACKUP_LINES[Math.floor(Math.random() * BROWSER_TTS_BACKUP_LINES.length)]
+}
+
+async function fetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { ...options, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
   const videoRef = useRef(null)
   const sceneRef = useRef(null)
@@ -74,14 +106,35 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
     let cancelled = false
     let currentAudio = null
 
+    // Last resort: the browser's own built-in voice, used once both the
+    // live Gemini call and the ElevenLabs call have failed or timed out.
+    const speakWithBrowserTTS = (text) => {
+      if (cancelled || !('speechSynthesis' in window)) return
+      console.log('[AI companion] (browser voice fallback)', text)
+      window.speechSynthesis.cancel()
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.rate = 0.95
+      window.speechSynthesis.speak(utterance)
+    }
+
     const speakAloud = async (text) => {
       try {
-        const response = await fetch('/api/elevenlabs', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, voiceId: COMPANION_VOICE_ID }),
-        })
-        if (!response.ok || cancelled) return
+        const response = await fetchWithTimeout(
+          '/api/elevenlabs',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, voiceId: COMPANION_VOICE_ID }),
+          },
+          COMPANION_FETCH_TIMEOUT_MS,
+        )
+        if (cancelled) return
+        if (!response.ok) {
+          const errBody = await response.text().catch(() => '')
+          console.error('ElevenLabs request failed:', response.status, errBody)
+          speakWithBrowserTTS(pickBackupLine())
+          return
+        }
 
         const blob = await response.blob()
         const url = URL.createObjectURL(blob)
@@ -96,10 +149,24 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
           currentAudio.pause()
           URL.revokeObjectURL(currentAudio.src)
         }
-        currentAudio = new Audio(url)
-        currentAudio.play().catch((err) => console.error('Could not play companion audio:', err))
+        const audio = new Audio(url)
+        currentAudio = audio
+
+        // Mobile browsers often block a play() call that happens at the
+        // end of an async chain like this one, even though the session
+        // itself started from a real tap. If that happens, don't just
+        // give up — try again the instant the user next taps anywhere,
+        // which mobile browsers do treat as a fresh, valid gesture.
+        audio.play().catch((err) => {
+          console.error('Could not play companion audio, will retry on next tap:', err)
+          const retryPlay = () => {
+            if (currentAudio === audio && !cancelled) audio.play().catch(() => {})
+          }
+          document.addEventListener('pointerdown', retryPlay, { once: true })
+        })
       } catch (err) {
         console.error('ElevenLabs request failed:', err)
+        speakWithBrowserTTS(pickBackupLine())
       }
     }
 
@@ -112,29 +179,38 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
       const phase =
         elapsedSeconds < 60 ? 'opening' : totalSeconds - elapsedSeconds <= 60 ? 'closing' : 'middle'
 
-      // Guaranteed backup for the opening/closing moments only, used when
-      // the live AI call itself fails (offline, API down, etc). Mid-session
-      // has no fallback — it's only ever the live, context-aware line.
+      // Guaranteed backup, used whenever the live Gemini call itself fails
+      // or times out. Opening/closing get the scenario-specific line (still
+      // routed through ElevenLabs, which has its own browser-voice backup
+      // if that fails too); mid-session has no scenario-specific line, so
+      // it goes straight to the browser-voice backup. Either way, the
+      // companion never goes completely silent.
       const speakFallback = () => {
         const fallback = scenario.aiFallbackLines?.[phase]
         if (fallback) {
           console.log('[AI companion] (fallback)', fallback)
           speakAloud(fallback)
+        } else {
+          speakWithBrowserTTS(pickBackupLine())
         }
       }
 
       try {
-        const response = await fetch('/api/companion', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            scenarioTitle: scenario.title,
-            scenarioContext: scenario.aiContext,
-            difficulty: scenario.difficulty,
-            elapsedSeconds,
-            durationMinutes: scenario.durationMinutes,
-          }),
-        })
+        const response = await fetchWithTimeout(
+          '/api/companion',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              scenarioTitle: scenario.title,
+              scenarioContext: scenario.aiContext,
+              difficulty: scenario.difficulty,
+              elapsedSeconds,
+              durationMinutes: scenario.durationMinutes,
+            }),
+          },
+          COMPANION_FETCH_TIMEOUT_MS,
+        )
         if (!response.ok) {
           speakFallback()
           return
@@ -167,6 +243,7 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
         currentAudio.pause()
         URL.revokeObjectURL(currentAudio.src)
       }
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel()
     }
   }, [scenario, sceneReady, onFlagDistress])
 
