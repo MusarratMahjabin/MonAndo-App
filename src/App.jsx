@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getInitialUser } from './firebase.js'
 import { migrateLocalDataToFirestore } from './migrateLocalData.js'
 import Welcome from './Welcome.jsx'
+import AuthOptions from './AuthOptions.jsx'
 import ProfileSetup from './ProfileSetup.jsx'
 import Home from './Home.jsx'
 import VRLibrary from './VRLibrary.jsx'
@@ -15,11 +16,13 @@ import UrbanSansa from './UrbanSansa.jsx'
 import SOS from './SOS.jsx'
 import CheckIn from './CheckIn.jsx'
 import Settings from './Settings.jsx'
+import Progress from './Progress.jsx'
 import { useAudioPlayer } from './useAudioPlayer.js'
 
 function App() {
   const [authChecked, setAuthChecked] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
+  const [preAuthScreen, setPreAuthScreen] = useState('welcome')
   const [screen, setScreen] = useState('home')
   const [selectedScenario, setSelectedScenario] = useState(null)
   const [hardwareMode, setHardwareMode] = useState('phone')
@@ -63,8 +66,11 @@ function App() {
   }
 
   if (!signedIn) {
+    if (preAuthScreen === 'welcome') {
+      return <Welcome onContinue={() => setPreAuthScreen('options')} />
+    }
     return (
-      <Welcome
+      <AuthOptions
         onSignedIn={() => {
           setSignedIn(true)
           setScreen('profile')
@@ -131,9 +137,13 @@ function App() {
       <SessionReview
         scenario={selectedScenario}
         sudsBefore={sudsBefore}
-        onDone={() => setScreen('home')}
+        onDone={() => setScreen('progress')}
       />
     )
+  }
+
+  if (screen === 'progress') {
+    return <Progress onBack={() => setScreen('home')} />
   }
 
   if (screen === 'vr' && selectedScenario) {

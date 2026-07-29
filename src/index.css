@@ -2054,7 +2054,7 @@ body {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 28px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .welcome-screen::before {
@@ -2152,15 +2152,20 @@ body {
 
 .welcome-logo-glow {
   position: absolute;
-  inset: -22px;
-  border-radius: 50%;
+  /* Wider and shifted down from the old plain circle, so the light
+     reaches the wordmark below the orb, not just the orb itself — the
+     wordmark's "Ando" is a dark indigo that was blending into the
+     background before this reached it. */
+  inset: -20px -34px -6px -34px;
+  border-radius: 32%;
   background: radial-gradient(
-    circle,
-    rgba(160, 150, 230, 0.5) 0%,
-    rgba(140, 170, 220, 0.22) 45%,
-    transparent 75%
+    ellipse at 50% 55%,
+    rgba(195, 185, 245, 0.65) 0%,
+    rgba(165, 170, 225, 0.4) 50%,
+    rgba(150, 155, 210, 0.2) 78%,
+    transparent 100%
   );
-  filter: blur(8px);
+  filter: blur(14px);
   animation: welcome-pulse 3.5s ease-in-out infinite;
 }
 
@@ -2573,4 +2578,222 @@ body {
 .settings-logout-confirm-btn {
   background: var(--sos-coral, #c0392b);
   color: var(--text-on-dark);
+}
+
+/* ---------- Progress ---------- */
+
+.progress-screen {
+  min-height: 100vh;
+  background: var(--bg-app);
+  padding: 20px 24px 48px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+}
+
+.progress-screen .profile-back {
+  margin-bottom: 20px;
+}
+
+.progress-headline {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-headline);
+  margin-bottom: 8px;
+}
+
+.progress-headline em {
+  font-style: italic;
+  font-weight: 600;
+}
+
+.progress-subtitle {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text-grey);
+  margin-bottom: 24px;
+}
+
+.progress-card {
+  background: var(--bg-card);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 2px 10px rgba(20, 24, 40, 0.06);
+}
+
+.progress-card-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.progress-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--text-grey);
+  text-transform: uppercase;
+}
+
+.progress-card-goal {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-grey);
+}
+
+.progress-card-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.progress-card-value {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--text-headline);
+}
+
+.progress-card-change {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.progress-card-change-good {
+  color: var(--green, #2fa66e);
+}
+
+.progress-card-change-bad {
+  color: #c0554f;
+}
+
+.progress-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  height: 120px;
+}
+
+.progress-bar-col {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.progress-bar-track {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 22px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.progress-bar-fill {
+  width: 100%;
+  border-radius: 999px;
+  min-height: 6px;
+  transition: height 0.3s ease;
+}
+
+.progress-bar-good {
+  background: var(--tile-teal);
+}
+
+.progress-bar-mid {
+  background: var(--tile-periwinkle);
+}
+
+.progress-bar-high {
+  background: var(--tile-terracotta);
+}
+
+.progress-bar-empty {
+  background: rgba(26, 26, 26, 0.1);
+}
+
+.progress-bar-label {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-grey);
+}
+
+.progress-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 30px 4px 14px;
+}
+
+.progress-section-title {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text-headline);
+}
+
+.progress-section-date {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-grey);
+}
+
+.progress-mood-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.progress-mood-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+}
+
+.progress-mood-good {
+  background: var(--tile-teal);
+}
+
+.progress-mood-tough {
+  background: var(--tile-terracotta);
+}
+
+.progress-mood-missed {
+  background: rgba(26, 26, 26, 0.1);
+}
+
+.progress-legend {
+  display: flex;
+  gap: 18px;
+}
+
+.progress-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-grey);
+}
+
+.progress-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.progress-legend-good {
+  background: var(--tile-teal);
+}
+
+.progress-legend-tough {
+  background: var(--tile-terracotta);
+}
+
+.progress-legend-missed {
+  background: rgba(26, 26, 26, 0.1);
 }
