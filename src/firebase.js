@@ -21,6 +21,7 @@ import {
   signInAnonymously,
   signInWithPopup,
   signInWithRedirect,
+  signOut as firebaseSignOut,
 } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
@@ -97,4 +98,19 @@ export function ensureAuth() {
     })
   }
   return authReadyPromise
+}
+
+// A Guest session (signInAnonymously) has no password or email — once
+// signed out there's no way back into that same account. Anything it
+// looks like they're about to lose belongs to the caller to warn about
+// before calling signOutUser().
+export function isGuestAccount() {
+  return !!auth.currentUser?.isAnonymous
+}
+
+export async function signOutUser() {
+  await firebaseSignOut(auth)
+  // Clear the cached uid so a fresh sign-in (guest or Google) after this
+  // one gets its own ensureAuth() promise instead of the old account's.
+  authReadyPromise = null
 }

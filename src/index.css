@@ -2383,3 +2383,194 @@ body {
   opacity: 0.4;
   cursor: default;
 }
+
+/* ---------- Settings ---------- */
+
+.settings-screen {
+  min-height: 100vh;
+  background: var(--bg-app);
+  padding: 20px 24px 48px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.settings-header .profile-back {
+  margin-bottom: 0;
+}
+
+.settings-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+
+.settings-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-grey);
+  margin: 22px 4px 10px;
+}
+
+.settings-card {
+  background: var(--bg-card);
+  border-radius: 18px;
+  box-shadow: 0 1px 4px rgba(20, 24, 40, 0.06);
+  overflow: hidden;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+}
+
+.settings-card .settings-row:last-child,
+.settings-card .settings-logout-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row-icon {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.settings-row-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.settings-row-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+
+.settings-row-subtitle {
+  font-size: 12.5px;
+  color: var(--text-grey);
+  margin-top: 2px;
+}
+
+.settings-row-trailing {
+  flex: 0 0 auto;
+}
+
+.settings-soon {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-grey);
+  background: var(--pill-track, rgba(26, 26, 26, 0.06));
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+
+.settings-toggle {
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(26, 26, 26, 0.12);
+  position: relative;
+}
+
+.settings-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.settings-toggle-disabled {
+  opacity: 0.6;
+}
+
+.settings-logout-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.settings-logout-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sos-coral, #c0392b);
+}
+
+.settings-logout-confirm {
+  padding: 18px 16px;
+}
+
+.settings-logout-confirm-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-grey);
+  margin-bottom: 16px;
+}
+
+.settings-logout-error {
+  font-size: 12.5px;
+  color: var(--sos-coral, #c0392b);
+  margin-bottom: 12px;
+}
+
+.settings-logout-confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.settings-logout-cancel,
+.settings-logout-confirm-btn {
+  flex: 1 1 0;
+  border: none;
+  border-radius: 999px;
+  padding: 12px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-logout-cancel {
+  background: var(--bg-app);
+  color: var(--text-ink);
+}
+
+.settings-logout-cancel:disabled,
+.settings-logout-confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.settings-logout-confirm-btn {
+  background: var(--sos-coral, #c0392b);
+  color: var(--text-on-dark);
+}

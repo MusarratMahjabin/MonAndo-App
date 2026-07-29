@@ -14,6 +14,7 @@ import NowPlaying from './NowPlaying.jsx'
 import UrbanSansa from './UrbanSansa.jsx'
 import SOS from './SOS.jsx'
 import CheckIn from './CheckIn.jsx'
+import Settings from './Settings.jsx'
 import { useAudioPlayer } from './useAudioPlayer.js'
 
 function App() {
@@ -74,6 +75,18 @@ function App() {
 
   if (screen === 'profile') {
     return <ProfileSetup onDone={() => setScreen('checkin')} />
+  }
+
+  if (screen === 'settings') {
+    return (
+      <Settings
+        onBack={() => setScreen('home')}
+        onLoggedOut={() => {
+          setSignedIn(false)
+          setScreen('home')
+        }}
+      />
+    )
   }
 
   if (screen === 'nowplaying' && currentTrack) {
@@ -179,6 +192,7 @@ function App() {
       onOpenUrbanSansa={() => setScreen('urbansansa')}
       onOpenSOS={() => setScreen('sos')}
       onOpenCheckIn={() => setScreen('checkin')}
+      onOpenSettings={() => setScreen('settings')}
     />
   )
 }

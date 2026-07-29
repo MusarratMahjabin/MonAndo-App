@@ -11,12 +11,12 @@ function HamburgerIcon() {
   )
 }
 
-function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenSOS, onOpenCheckIn }) {
+function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenSOS, onOpenCheckIn, onOpenSettings }) {
   return (
     <div className="home2-screen">
       <div className="home2-topbar">
         <span className="home2-topbar-logo">MonAndo</span>
-        <button className="home2-topbar-menu" type="button" aria-label="Menu">
+        <button className="home2-topbar-menu" type="button" aria-label="Settings" onClick={onOpenSettings}>
           <HamburgerIcon />
         </button>
       </div>
