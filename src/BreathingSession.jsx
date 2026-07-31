@@ -41,7 +41,7 @@ function wordAt(index) {
   return index % 2 === 0 ? 'Inhale' : 'Exhale'
 }
 
-function BreathingSession({ track, onCollapse, onToggleAudio }) {
+function BreathingSession({ track, onCollapse, onToggleAudio, onStopAudio }) {
   const [phaseIndex, setPhaseIndex] = useState(0)
   const [paused, setPaused] = useState(false)
 
@@ -58,6 +58,11 @@ function BreathingSession({ track, onCollapse, onToggleAudio }) {
     onToggleAudio?.()
   }
 
+  const handleCollapse = () => {
+    onStopAudio?.()
+    onCollapse()
+  }
+
   const offsets = []
   for (let offset = -WINDOW; offset <= WINDOW; offset++) offsets.push(offset)
 
@@ -70,7 +75,7 @@ function BreathingSession({ track, onCollapse, onToggleAudio }) {
         <button
           className="nowplaying-collapse"
           type="button"
-          onClick={onCollapse}
+          onClick={handleCollapse}
           aria-label="Collapse"
         >
           <DownChevron />

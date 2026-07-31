@@ -28,7 +28,7 @@ function App() {
   const [hardwareMode, setHardwareMode] = useState('phone')
   const [sudsBefore, setSudsBefore] = useState(5)
   const [nowPlayingReturn, setNowPlayingReturn] = useState('music')
-  const { currentTrack, isPlaying, play, toggle } = useAudioPlayer()
+  const { currentTrack, isPlaying, play, pause, toggle } = useAudioPlayer()
 
   // Check once whether this device already has a signed-in session (Guest
   // or Google) from a previous visit. Everyone sees the Welcome splash
@@ -102,6 +102,7 @@ function App() {
         track={currentTrack}
         isPlaying={isPlaying}
         onToggleAudio={() => toggle(currentTrack)}
+        onStopAudio={pause}
         onCollapse={() => setScreen(nowPlayingReturn)}
       />
     )

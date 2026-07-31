@@ -22,7 +22,7 @@ function DownChevron() {
   )
 }
 
-function NowPlaying({ track, onCollapse, isPlaying, onToggleAudio }) {
+function NowPlaying({ track, onCollapse, isPlaying, onToggleAudio, onStopAudio }) {
   if (track.category === 'Meditation') {
     return (
       <BreathingSession
@@ -30,6 +30,7 @@ function NowPlaying({ track, onCollapse, isPlaying, onToggleAudio }) {
         onCollapse={onCollapse}
         isPlaying={isPlaying}
         onToggleAudio={onToggleAudio}
+        onStopAudio={onStopAudio}
       />
     )
   }
