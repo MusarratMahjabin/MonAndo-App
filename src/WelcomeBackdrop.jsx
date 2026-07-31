@@ -17,9 +17,9 @@ const DOTS = [
   [91, 68, 2, 0.6],
 ]
 
-function WelcomeBackdrop({ children }) {
+function WelcomeBackdrop({ children, onClick }) {
   return (
-    <div className="welcome-screen">
+    <div className="welcome-screen" onClick={onClick}>
       {DOTS.map(([top, left, size, opacity], i) => (
         <span
           key={i}

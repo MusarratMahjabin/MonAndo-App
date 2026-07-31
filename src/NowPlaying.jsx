@@ -1,3 +1,5 @@
+import BreathingSession from './BreathingSession.jsx'
+
 function hexToRgba(hex, alpha) {
   const clean = hex.replace('#', '')
   const r = parseInt(clean.substring(0, 2), 16)
@@ -20,7 +22,18 @@ function DownChevron() {
   )
 }
 
-function NowPlaying({ track, onCollapse }) {
+function NowPlaying({ track, onCollapse, isPlaying, onToggleAudio }) {
+  if (track.category === 'Meditation') {
+    return (
+      <BreathingSession
+        track={track}
+        onCollapse={onCollapse}
+        isPlaying={isPlaying}
+        onToggleAudio={onToggleAudio}
+      />
+    )
+  }
+
   const tint = track.overlayTint || '#2C3E4A'
   const gradient = `linear-gradient(to bottom, ${hexToRgba(tint, 0.88)} 0%, ${hexToRgba(
     tint,

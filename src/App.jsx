@@ -28,15 +28,15 @@ function App() {
   const [hardwareMode, setHardwareMode] = useState('phone')
   const [sudsBefore, setSudsBefore] = useState(5)
   const [nowPlayingReturn, setNowPlayingReturn] = useState('music')
-  const { currentTrack, isPlaying, play } = useAudioPlayer()
+  const { currentTrack, isPlaying, play, toggle } = useAudioPlayer()
 
   // Check once whether this device already has a signed-in session (Guest
-  // or Google) from a previous visit. Returning users go straight to the
-  // mood check-in — they've already done Welcome and profile setup before.
-  // Brand new sign-ins go to profile setup first (handled in Welcome's
-  // onSignedIn below). The first time a session is found, also copy over
-  // anything saved in this browser's old localStorage before the app
-  // moved to Firestore.
+  // or Google) from a previous visit. Everyone sees the Welcome splash
+  // first, regardless — returning users then go straight to the mood
+  // check-in (already set below) instead of the sign-in screen; brand new
+  // visitors go to sign-in, then profile setup. The first time a session
+  // is found, also copy over anything saved in this browser's old
+  // localStorage before the app moved to Firestore.
   useEffect(() => {
     getInitialUser()
       .then((user) => {
@@ -65,10 +65,11 @@ function App() {
     return <div className="app-boot" />
   }
 
+  if (preAuthScreen === 'welcome') {
+    return <Welcome onContinue={() => setPreAuthScreen('done')} />
+  }
+
   if (!signedIn) {
-    if (preAuthScreen === 'welcome') {
-      return <Welcome onContinue={() => setPreAuthScreen('options')} />
-    }
     return (
       <AuthOptions
         onSignedIn={() => {
@@ -96,7 +97,14 @@ function App() {
   }
 
   if (screen === 'nowplaying' && currentTrack) {
-    return <NowPlaying track={currentTrack} onCollapse={() => setScreen(nowPlayingReturn)} />
+    return (
+      <NowPlaying
+        track={currentTrack}
+        isPlaying={isPlaying}
+        onToggleAudio={() => toggle(currentTrack)}
+        onCollapse={() => setScreen(nowPlayingReturn)}
+      />
+    )
   }
 
   if (screen === 'sos') {
