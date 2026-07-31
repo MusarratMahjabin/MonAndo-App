@@ -15,7 +15,7 @@ const scenarios = [
     durationMinutes: 10,
     emoji: '🎤',
     thumbnailUrl: 'https://res.cloudinary.com/lszcugmx/image/upload/v1784473399/IMG_8609_fcqxuc.png',
-    videoUrl: 'https://res.cloudinary.com/lszcugmx/video/upload/q_auto/v1784471349/public_speaking_uwgu6y.mp4',
+    videoUrl: 'https://res.cloudinary.com/lszcugmx/video/upload/v1785211575/public_speaking_final_lrrj2t.mp4',
     aiContext: 'The user is standing at the front and about to give a presentation, classmates watching',
     aiFallbackLines: {
       opening: "You're standing where you meant to stand. That's already something.",
