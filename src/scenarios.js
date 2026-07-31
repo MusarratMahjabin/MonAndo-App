@@ -1,68 +1,10 @@
 // ============================================================
 // MonAndo VR Scenarios — Configuration File
 // ============================================================
-//
-// This is the ONLY file you need to edit to add, remove, or update
-// a VR practice scenario. You do not need to open or touch any
-// other file in the project.
-//
-// HOW TO ADD A NEW SCENARIO:
-//   1. Copy one whole scenario block below — everything from the
-//      opening "{" to the closing "},".
-//   2. Paste the copy just above the closing "]" at the bottom of
-//      this file.
-//   3. Change the values inside the copy (see the Field Guide below).
-//   4. Give it a new, unique "id" (no spaces — use dashes instead,
-//      e.g. "airport-security").
-//   5. Save the file. It will show up in the app automatically.
-//
-// HOW TO EDIT AN EXISTING SCENARIO:
-//   Just change the text between the quotes for whichever field you
-//   want to update, then save the file.
-//
-// HOW TO REMOVE A SCENARIO:
-//   Delete its whole block, from its opening "{" to the "}," that follows it.
-//
-// ------------------------------------------------------------
-// FIELD GUIDE — what each line means:
-//
-//   id               A short unique code, no spaces (dashes are OK).
-//                     Used internally — the user never sees it.
-//   title            The name shown to the user, e.g. "Class Presentation"
-//   category         Must be exactly one of:
-//                       "Social", "Performance", "Phobia", "Medical", "Calm"
-//   difficulty       Must be exactly one of: "Easy", "Medium", "Hard"
-//   durationMinutes  Length of the video in minutes. Just a number,
-//                     no quotes, no "min" — e.g. 10
-//   emoji            One emoji used as this scenario's icon, e.g. "🎤"
-//   thumbnailUrl     Link to a small preview image, from Cloudinary.
-//   videoUrl         Link to the 360° video, from Cloudinary.
-//   aiContext        One short sentence describing the situation, written
-//                     so the AI companion understands what the user is
-//                     about to face.
-//   aiFallbackLines  { opening, closing } — one guaranteed line for the
-//                     start and one for the end of the session, spoken
-//                     ONLY if the live AI call fails (no internet, API
-//                     down, etc). Mid-session lines have no fallback —
-//                     they're always generated live from aiContext.
-//                     Keep the same pattern as the built-in scenarios:
-//                     ground the body, normalize the feeling, affirm
-//                     the moment.
-//
-// HOW TO GET A CLOUDINARY LINK:
-//   Open the video or image in your Cloudinary dashboard, click it,
-//   and copy the "URL" it shows you — it looks like:
-//   https://res.cloudinary.com/your-cloud-name/video/upload/v1234567890/classroom.mp4
-//   Paste that whole link between the quotes for videoUrl (or thumbnailUrl
-//   for an image). Keep the quotes — just replace what's between them.
+
 //
 // IMPORTANT — for videoUrl, add "q_auto/" right after "upload/":
-//   https://res.cloudinary.com/your-cloud-name/video/upload/q_auto/v1234567890/classroom.mp4
-//   Without this, the video can take much longer to start playing (or get
-//   stuck) on phones, because Cloudinary otherwise sends the raw, un-
-//   optimized file it was originally uploaded as. "q_auto" tells Cloudinary
-//   to send a smaller, phone-friendly version that starts playing quickly.
-// ============================================================
+
 
 const scenarios = [
   {
