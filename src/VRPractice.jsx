@@ -3,8 +3,8 @@ import LoadingScreen from './LoadingScreen.jsx'
 
 // Lines are spoken this often, with a little natural variance rather than
 // a rigid, machine-precise beat.
-const COMPANION_MIN_INTERVAL_MS = 50_000
-const COMPANION_MAX_INTERVAL_MS = 60_000
+const COMPANION_MIN_INTERVAL_MS = 25_000
+const COMPANION_MAX_INTERVAL_MS = 30_000
 
 // ElevenLabs voice used for the AI companion's spoken lines. "Sarah"
 // (Mature, Reassuring, Confident) — one of this account's actual premade
