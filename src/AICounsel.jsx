@@ -1,8 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
-import { saveCounselSession } from './counselStore.js'
+import { getRecentCounselSessions, saveCounselSession } from './counselStore.js'
 import { useNickname } from './useNickname.js'
 
 const FETCH_TIMEOUT_MS = 8_000
+const ROUND_LABELS = ['Share', 'Feel', 'Reflect', 'Wrap up']
+const TEXTAREA_MAX_HEIGHT = 116
+
+const SUGGESTION_META = {
+  music: { label: 'Music & ASMR', icon: '🎵', screen: 'music', color: 'var(--tile-teal)' },
+  vr: { label: 'VR Therapy', icon: '🥽', screen: 'list', color: 'var(--tile-terracotta)' },
+  urbansansa: { label: 'Urban Sansa', icon: '🏙️', screen: 'urbansansa', color: 'var(--tile-olive)' },
+}
+
+const FALLBACK_SUMMARY = {
+  score: null,
+  dimensions: { openness: null, awareness: null, reflection: null },
+  themes: [],
+  summary: "Thanks for taking a few minutes for yourself today — that's already something.",
+  suggestion: null,
+}
+
+function formatDuration(seconds) {
+  if (typeof seconds !== 'number') return '—'
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return m > 0 ? `${m}m ${s}s` : `${s}s`
+}
 
 function BackChevron() {
   return (
@@ -61,7 +84,7 @@ async function postJson(url, body) {
   return null
 }
 
-function AICounsel({ onBack, onFlagDistress }) {
+function AICounsel({ onBack, onFlagDistress, onNavigate }) {
   const nickname = useNickname()
   const [round, setRound] = useState(0)
   const [history, setHistory] = useState([])
@@ -71,10 +94,20 @@ function AICounsel({ onBack, onFlagDistress }) {
   const [summary, setSummary] = useState(null)
   const [startTime] = useState(() => Date.now())
   const scrollRef = useRef(null)
+  const textareaRef = useRef(null)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [history, loading])
+
+  // Let the input grow with multi-line messages instead of scrolling
+  // its own text sideways.
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, TEXTAREA_MAX_HEIGHT)}px`
+  }, [input])
 
   // Kick off the opening greeting on mount, generated the same way as
   // every other line — not a hardcoded string — so it goes through the
@@ -95,16 +128,23 @@ function AICounsel({ onBack, onFlagDistress }) {
 
   const finishSession = async (finalHistory) => {
     const durationSeconds = Math.round((Date.now() - startTime) / 1000)
-    const result = await postJson('/api/counsel-summary', { history: finalHistory })
-    const finalSummary = result || {
-      score: null,
-      summary: "Thanks for taking a few minutes for yourself today — that's already something.",
-    }
-    setSummary(finalSummary)
+    const exchangeCount = finalHistory.filter((m) => m.role === 'user').length
+
+    const [result, recentSessions] = await Promise.all([
+      postJson('/api/counsel-summary', { history: finalHistory }),
+      getRecentCounselSessions(1).catch(() => []),
+    ])
+    const finalSummary = result || FALLBACK_SUMMARY
+    const previousScore = typeof recentSessions[0]?.score === 'number' ? recentSessions[0].score : null
+
+    setSummary({ ...finalSummary, previousScore, exchangeCount, durationSeconds })
     saveCounselSession({
       history: finalHistory,
       score: finalSummary.score,
+      dimensions: finalSummary.dimensions,
+      themes: finalSummary.themes,
       summary: finalSummary.summary,
+      suggestion: finalSummary.suggestion,
       durationSeconds,
     }).catch((err) => console.error('Failed to save Reflect session:', err))
   }
@@ -143,6 +183,20 @@ function AICounsel({ onBack, onFlagDistress }) {
   }
 
   if (summary) {
+    const dims = summary.dimensions || {}
+    const dimEntries = [
+      { key: 'openness', label: 'Openness', value: dims.openness, color: 'var(--tile-periwinkle)' },
+      { key: 'awareness', label: 'Awareness', value: dims.awareness, color: 'var(--tile-teal)' },
+      { key: 'reflection', label: 'Reflection', value: dims.reflection, color: 'var(--tile-terracotta)' },
+    ].filter((d) => typeof d.value === 'number')
+
+    const trend =
+      typeof summary.score === 'number' && typeof summary.previousScore === 'number'
+        ? summary.score - summary.previousScore
+        : null
+
+    const meta = summary.suggestion && SUGGESTION_META[summary.suggestion.category]
+
     return (
       <div className="counsel-screen">
         <button className="profile-back" type="button" aria-label="Back" onClick={onBack}>
@@ -171,10 +225,70 @@ function AICounsel({ onBack, onFlagDistress }) {
           )}
           <p className="counsel-score-caption">Just a gentle guide — not a test.</p>
 
+          {trend !== null && trend !== 0 && (
+            <div className={`counsel-trend ${trend > 0 ? 'is-up' : 'is-down'}`}>
+              {trend > 0 ? `▲ ${trend} vs. last time` : `▼ ${Math.abs(trend)} vs. last time`}
+            </div>
+          )}
+
           <h1 className="counsel-end-title">
             Thank you for reflecting today{nickname ? `, ${nickname}` : ''}.
           </h1>
           <p className="counsel-end-summary">{summary.summary}</p>
+
+          {dimEntries.length > 0 && (
+            <div className="counsel-dims">
+              {dimEntries.map((d) => (
+                <div className="counsel-dim" key={d.key}>
+                  <div className="counsel-dim-row">
+                    <span className="counsel-dim-label">{d.label}</span>
+                    <span className="counsel-dim-value">{d.value}</span>
+                  </div>
+                  <div className="counsel-dim-track">
+                    <div className="counsel-dim-fill" style={{ width: `${d.value}%`, background: d.color }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {summary.themes?.length > 0 && (
+            <div className="counsel-themes">
+              {summary.themes.map((t) => (
+                <span className="counsel-theme-chip" key={t}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="counsel-stats">
+            <span>🕐 {formatDuration(summary.durationSeconds)}</span>
+            <span>
+              💬 {summary.exchangeCount} {summary.exchangeCount === 1 ? 'exchange' : 'exchanges'}
+            </span>
+          </div>
+
+          {meta && (
+            <div className="counsel-suggestion">
+              <span className="counsel-suggestion-icon" style={{ background: meta.color }}>
+                {meta.icon}
+              </span>
+              <div className="counsel-suggestion-body">
+                <div className="counsel-suggestion-label">{meta.label}</div>
+                <p className="counsel-suggestion-text">{summary.suggestion.text}</p>
+              </div>
+              {onNavigate && (
+                <button
+                  className="counsel-suggestion-btn"
+                  type="button"
+                  onClick={() => onNavigate(meta.screen)}
+                >
+                  Try →
+                </button>
+              )}
+            </div>
+          )}
 
           <button className="counsel-done-btn" type="button" onClick={onBack}>
             Done
@@ -194,22 +308,53 @@ function AICounsel({ onBack, onFlagDistress }) {
       </div>
       <p className="counsel-subtitle">A question, not advice.</p>
 
+      <div className="counsel-progress">
+        {ROUND_LABELS.map((label, i) => (
+          <div
+            key={label}
+            className={`counsel-progress-step${i < round ? ' is-done' : ''}${i === round ? ' is-current' : ''}`}
+          >
+            <span className="counsel-progress-dot" />
+            <span className="counsel-progress-label">{label}</span>
+          </div>
+        ))}
+      </div>
+
       <div className="counsel-chat" ref={scrollRef}>
-        {starting && <div className="counsel-bubble counsel-bubble-assistant counsel-bubble-loading">…</div>}
+        {starting && (
+          <div className="counsel-bubble counsel-bubble-assistant counsel-bubble-loading">
+            <span className="counsel-dot" />
+            <span className="counsel-dot" />
+            <span className="counsel-dot" />
+          </div>
+        )}
         {history.map((m, i) => (
           <div key={i} className={`counsel-bubble counsel-bubble-${m.role}`}>
             {m.content}
           </div>
         ))}
-        {loading && <div className="counsel-bubble counsel-bubble-assistant counsel-bubble-loading">…</div>}
+        {loading && (
+          <div className="counsel-bubble counsel-bubble-assistant counsel-bubble-loading">
+            <span className="counsel-dot" />
+            <span className="counsel-dot" />
+            <span className="counsel-dot" />
+          </div>
+        )}
       </div>
 
       <div className="counsel-input-bar">
-        <input
+        <textarea
+          ref={textareaRef}
           className="counsel-input"
+          rows={1}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              sendMessage()
+            }
+          }}
           placeholder="Type what's on your mind…"
           disabled={loading || starting}
         />

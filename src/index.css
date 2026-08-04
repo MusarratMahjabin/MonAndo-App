@@ -3279,7 +3279,52 @@ body {
 .counsel-subtitle {
   font-size: 13px;
   color: var(--text-grey);
-  margin: 4px 0 18px;
+  margin: 4px 0 14px;
+}
+
+.counsel-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.counsel-progress-step {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.counsel-progress-dot {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(26, 26, 26, 0.1);
+  transition: background 0.3s ease;
+}
+
+.counsel-progress-step.is-done .counsel-progress-dot {
+  background: var(--tile-periwinkle);
+}
+
+.counsel-progress-step.is-current .counsel-progress-dot {
+  background: var(--tile-periwinkle);
+  opacity: 0.55;
+}
+
+.counsel-progress-label {
+  font-size: 10px;
+  letter-spacing: 0.3px;
+  color: var(--text-grey);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.counsel-progress-step.is-current .counsel-progress-label {
+  opacity: 1;
+  color: var(--text-headline);
+  font-weight: 600;
 }
 
 .counsel-chat {
@@ -3297,6 +3342,18 @@ body {
   border-radius: 18px;
   font-size: 14.5px;
   line-height: 1.45;
+  animation: counsel-bubble-in 0.28s ease;
+}
+
+@keyframes counsel-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .counsel-bubble-assistant {
@@ -3315,14 +3372,45 @@ body {
 }
 
 .counsel-bubble-loading {
-  color: var(--text-grey);
-  font-weight: 700;
-  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 16px;
+}
+
+.counsel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-grey);
+  opacity: 0.5;
+  animation: counsel-dot-bounce 1.1s ease-in-out infinite;
+}
+
+.counsel-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.counsel-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes counsel-dot-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
 }
 
 .counsel-input-bar {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 10px;
   margin-top: 10px;
 }
@@ -3330,12 +3418,15 @@ body {
 .counsel-input {
   flex: 1 1 auto;
   border: 1.5px solid rgba(26, 26, 26, 0.12);
-  border-radius: 999px;
+  border-radius: 22px;
   padding: 13px 18px;
   font-family: var(--sans);
   font-size: 14.5px;
   color: var(--text-ink);
   background: var(--bg-card);
+  resize: none;
+  max-height: 116px;
+  line-height: 1.4;
 }
 
 .counsel-input:focus {
@@ -3407,7 +3498,25 @@ body {
 .counsel-score-caption {
   font-size: 12px;
   color: var(--text-grey);
-  margin-bottom: 24px;
+  margin-bottom: 10px;
+}
+
+.counsel-trend {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.counsel-trend.is-up {
+  color: #2f7d4f;
+  background: rgba(47, 125, 79, 0.12);
+}
+
+.counsel-trend.is-down {
+  color: #a1543c;
+  background: rgba(161, 84, 60, 0.12);
 }
 
 .counsel-end-title {
@@ -3422,8 +3531,127 @@ body {
   font-size: 14.5px;
   line-height: 1.6;
   color: var(--text-grey);
-  margin-bottom: 32px;
+  margin-bottom: 26px;
   max-width: 320px;
+}
+
+.counsel-dims {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.counsel-dim-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 12.5px;
+}
+
+.counsel-dim-label {
+  color: var(--text-ink);
+  font-weight: 600;
+}
+
+.counsel-dim-value {
+  color: var(--text-grey);
+}
+
+.counsel-dim-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(26, 26, 26, 0.08);
+  overflow: hidden;
+}
+
+.counsel-dim-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s ease;
+}
+
+.counsel-themes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 22px;
+  max-width: 320px;
+}
+
+.counsel-theme-chip {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-headline);
+  background: rgba(26, 26, 26, 0.06);
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.counsel-stats {
+  display: flex;
+  gap: 20px;
+  font-size: 12.5px;
+  color: var(--text-grey);
+  margin-bottom: 24px;
+}
+
+.counsel-suggestion {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  background: var(--bg-card);
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 6px rgba(20, 24, 40, 0.06);
+}
+
+.counsel-suggestion-icon {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.counsel-suggestion-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.counsel-suggestion-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-headline);
+  margin-bottom: 2px;
+}
+
+.counsel-suggestion-text {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-grey);
+}
+
+.counsel-suggestion-btn {
+  flex: 0 0 auto;
+  border: none;
+  background: none;
+  color: var(--tile-periwinkle);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px;
 }
 
 .counsel-done-btn {

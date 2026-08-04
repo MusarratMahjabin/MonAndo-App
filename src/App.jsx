@@ -139,7 +139,11 @@ function App() {
 
   if (screen === 'reflect') {
     return (
-      <AICounsel onBack={() => setScreen('home')} onFlagDistress={() => setScreen('sos')} />
+      <AICounsel
+        onBack={() => setScreen('home')}
+        onFlagDistress={() => setScreen('sos')}
+        onNavigate={setScreen}
+      />
     )
   }
 
