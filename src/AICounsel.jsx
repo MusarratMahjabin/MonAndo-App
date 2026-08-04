@@ -135,9 +135,9 @@ function AICounsel({ onBack, onFlagDistress, onNavigate }) {
       getRecentCounselSessions(1).catch(() => []),
     ])
     const finalSummary = result || FALLBACK_SUMMARY
-    const previousScore = typeof recentSessions[0]?.score === 'number' ? recentSessions[0].score : null
+    const previousSession = recentSessions[0] || null
 
-    setSummary({ ...finalSummary, previousScore, exchangeCount, durationSeconds })
+    setSummary({ ...finalSummary, previousSession, exchangeCount, durationSeconds })
     saveCounselSession({
       history: finalHistory,
       score: finalSummary.score,
@@ -184,26 +184,47 @@ function AICounsel({ onBack, onFlagDistress, onNavigate }) {
 
   if (summary) {
     const dims = summary.dimensions || {}
-    const dimEntries = [
-      { key: 'openness', label: 'Openness', value: dims.openness, color: 'var(--tile-periwinkle)' },
-      { key: 'awareness', label: 'Awareness', value: dims.awareness, color: 'var(--tile-teal)' },
-      { key: 'reflection', label: 'Reflection', value: dims.reflection, color: 'var(--tile-terracotta)' },
-    ].filter((d) => typeof d.value === 'number')
+    const prevDims = summary.previousSession?.dimensions || {}
+    const dimCards = [
+      { key: 'openness', label: 'Openness', value: dims.openness, prev: prevDims.openness },
+      { key: 'awareness', label: 'Awareness', value: dims.awareness, prev: prevDims.awareness },
+      { key: 'reflection', label: 'Reflection', value: dims.reflection, prev: prevDims.reflection },
+    ]
+      .filter((d) => typeof d.value === 'number')
+      .map((d) => ({ ...d, delta: typeof d.prev === 'number' ? d.value - d.prev : null }))
 
-    const trend =
-      typeof summary.score === 'number' && typeof summary.previousScore === 'number'
-        ? summary.score - summary.previousScore
+    const previousScore = typeof summary.previousSession?.score === 'number' ? summary.previousSession.score : null
+    const scoreTrend = typeof summary.score === 'number' && previousScore !== null ? summary.score - previousScore : null
+
+    const previousDuration = summary.previousSession?.durationSeconds
+    const timeDelta =
+      typeof previousDuration === 'number' && previousDuration > 0
+        ? Math.round(((summary.durationSeconds - previousDuration) / previousDuration) * 100)
         : null
+    const timeDeltaText =
+      timeDelta === null
+        ? null
+        : timeDelta === 0
+          ? 'Same length as last time'
+          : timeDelta < 0
+            ? `${Math.abs(timeDelta)}% quicker than last time`
+            : `${timeDelta}% longer than last time`
 
     const meta = summary.suggestion && SUGGESTION_META[summary.suggestion.category]
 
     return (
       <div className="counsel-screen">
-        <button className="profile-back" type="button" aria-label="Back" onClick={onBack}>
-          <BackChevron />
-        </button>
+        <div className="counsel-header">
+          <button className="profile-back" type="button" aria-label="Back" onClick={onBack}>
+            <BackChevron />
+          </button>
+          <h1 className="counsel-title">Reflect</h1>
+        </div>
 
         <div className="counsel-end">
+          <p className="counsel-end-eyebrow">TODAY'S REFLECTION</p>
+          <h2 className="counsel-end-done">Done!</h2>
+
           {summary.score !== null && (
             <div className="counsel-score-ring">
               <svg viewBox="0 0 100 100">
@@ -220,37 +241,43 @@ function AICounsel({ onBack, onFlagDistress, onNavigate }) {
                   transform="rotate(-90 50 50)"
                 />
               </svg>
-              <div className="counsel-score-number">{summary.score}</div>
+              <div className="counsel-score-ring-text">
+                <div className="counsel-score-number">{summary.score}%</div>
+                <div className="counsel-score-ring-label">Total Score</div>
+              </div>
             </div>
           )}
           <p className="counsel-score-caption">Just a gentle guide — not a test.</p>
 
-          {trend !== null && trend !== 0 && (
-            <div className={`counsel-trend ${trend > 0 ? 'is-up' : 'is-down'}`}>
-              {trend > 0 ? `▲ ${trend} vs. last time` : `▼ ${Math.abs(trend)} vs. last time`}
+          {scoreTrend !== null && scoreTrend !== 0 && (
+            <div className={`counsel-trend ${scoreTrend > 0 ? 'is-up' : 'is-down'}`}>
+              {scoreTrend > 0 ? `▲ ${scoreTrend} vs. last time` : `▼ ${Math.abs(scoreTrend)} vs. last time`}
             </div>
           )}
 
-          <h1 className="counsel-end-title">
-            Thank you for reflecting today{nickname ? `, ${nickname}` : ''}.
-          </h1>
+          <p className="counsel-end-thanks">
+            {nickname ? `Thank you, ${nickname}.` : 'Thank you for taking this time.'}
+          </p>
           <p className="counsel-end-summary">{summary.summary}</p>
 
-          {dimEntries.length > 0 && (
-            <div className="counsel-dims">
-              {dimEntries.map((d) => (
-                <div className="counsel-dim" key={d.key}>
-                  <div className="counsel-dim-row">
-                    <span className="counsel-dim-label">{d.label}</span>
-                    <span className="counsel-dim-value">{d.value}</span>
-                  </div>
-                  <div className="counsel-dim-track">
-                    <div className="counsel-dim-fill" style={{ width: `${d.value}%`, background: d.color }} />
-                  </div>
-                </div>
-              ))}
+          <div className="counsel-stat-grid">
+            <div className="counsel-stat-card grain">
+              <div className="counsel-stat-label">Time</div>
+              <div className="counsel-stat-value">{formatDuration(summary.durationSeconds)}</div>
+              {timeDeltaText && <p className="counsel-stat-caption">{timeDeltaText}</p>}
             </div>
-          )}
+            {dimCards.map((d) => (
+              <div className="counsel-stat-card grain" key={d.key}>
+                <div className="counsel-stat-label">{d.label}</div>
+                <div className="counsel-stat-value">{d.value}%</div>
+                {d.delta !== null && d.delta !== 0 && (
+                  <p className={`counsel-stat-caption counsel-stat-delta ${d.delta > 0 ? 'is-up' : 'is-down'}`}>
+                    {d.delta > 0 ? `▲ ${d.delta} pts` : `▼ ${Math.abs(d.delta)} pts`} vs. last time
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
 
           {summary.themes?.length > 0 && (
             <div className="counsel-themes">
@@ -263,10 +290,7 @@ function AICounsel({ onBack, onFlagDistress, onNavigate }) {
           )}
 
           <div className="counsel-stats">
-            <span>🕐 {formatDuration(summary.durationSeconds)}</span>
-            <span>
-              💬 {summary.exchangeCount} {summary.exchangeCount === 1 ? 'exchange' : 'exchanges'}
-            </span>
+            <span>💬 {summary.exchangeCount} {summary.exchangeCount === 1 ? 'exchange' : 'exchanges'}</span>
           </div>
 
           {meta && (
