@@ -11,7 +11,7 @@ function HamburgerIcon() {
   )
 }
 
-function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenSOS, onOpenCheckIn, onOpenSettings }) {
+function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenCheckIn, onOpenSettings }) {
   return (
     <div className="home2-screen">
       <div className="home2-topbar">
@@ -20,12 +20,6 @@ function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenSOS, onOpenCheck
           <HamburgerIcon />
         </button>
       </div>
-
-      {/* Temporary stand-in for the real SOS entry point, which belongs
-          in the bottom nav bar once that's built. */}
-      <button className="home2-sos-fab" type="button" onClick={onOpenSOS}>
-        SOS
-      </button>
 
       <h1 className="home2-headline">
         Let's begin

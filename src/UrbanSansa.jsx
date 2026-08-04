@@ -9,14 +9,15 @@ const WEATHER_OPTIONS = [
   { id: 'calm-night', emoji: '🌙', label: 'Calm night' },
 ]
 
-function HamburgerIcon() {
+function BackChevron() {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
       <path
-        d="M3 5H17M3 10H17M3 15H17"
+        d="M11.5 3.5L6 9L11.5 14.5"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="2"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   )
@@ -35,10 +36,10 @@ function UrbanSansa({ onBack, onOpenFeature }) {
   return (
     <div className="us-screen">
       <div className="us-topbar">
-        <span className="us-topbar-logo">UrbanSansa</span>
-        <button className="us-topbar-menu" type="button" onClick={onBack} aria-label="Menu">
-          <HamburgerIcon />
+        <button className="us-back" type="button" onClick={onBack} aria-label="Back to Home">
+          <BackChevron />
         </button>
+        <span className="us-topbar-logo">UrbanSansa</span>
       </div>
 
       <h1 className="us-greeting">

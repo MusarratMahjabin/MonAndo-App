@@ -21,7 +21,21 @@ function StarRating({ value, onChange }) {
   )
 }
 
-function SessionReview({ scenario, sudsBefore, onDone }) {
+function BackChevron() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path
+        d="M11.5 3.5L6 9L11.5 14.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+function SessionReview({ scenario, sudsBefore, onBack, onDone }) {
   // This session hasn't been saved yet, so an empty history here means
   // it's about to become the user's first. Loaded from Firestore, so it
   // starts false and pops in once we know for sure.
@@ -75,6 +89,10 @@ function SessionReview({ scenario, sudsBefore, onDone }) {
 
   return (
     <div className="review-screen">
+      <button className="profile-back" type="button" aria-label="Back" onClick={onBack}>
+        <BackChevron />
+      </button>
+
       <div className="review-eyebrow">SESSION COMPLETE</div>
       <h1 className="review-title">You did it.</h1>
       <h2 className="review-subtitle">How do you feel right now?</h2>

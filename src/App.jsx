@@ -17,6 +17,7 @@ import SOS from './SOS.jsx'
 import CheckIn from './CheckIn.jsx'
 import Settings from './Settings.jsx'
 import Progress from './Progress.jsx'
+import BottomNav from './BottomNav.jsx'
 import { useAudioPlayer } from './useAudioPlayer.js'
 
 function App() {
@@ -86,13 +87,16 @@ function App() {
 
   if (screen === 'settings') {
     return (
-      <Settings
-        onBack={() => setScreen('home')}
-        onLoggedOut={() => {
-          setSignedIn(false)
-          setScreen('home')
-        }}
-      />
+      <>
+        <Settings
+          onBack={() => setScreen('home')}
+          onLoggedOut={() => {
+            setSignedIn(false)
+            setScreen('home')
+          }}
+        />
+        <BottomNav current="settings" onNavigate={setScreen} />
+      </>
     )
   }
 
@@ -109,7 +113,12 @@ function App() {
   }
 
   if (screen === 'sos') {
-    return <SOS onBack={() => setScreen('home')} />
+    return (
+      <>
+        <SOS onBack={() => setScreen('home')} />
+        <BottomNav current="sos" onNavigate={setScreen} />
+      </>
+    )
   }
 
   if (screen === 'checkin') {
@@ -146,13 +155,19 @@ function App() {
       <SessionReview
         scenario={selectedScenario}
         sudsBefore={sudsBefore}
+        onBack={() => setScreen('home')}
         onDone={() => setScreen('progress')}
       />
     )
   }
 
   if (screen === 'progress') {
-    return <Progress onBack={() => setScreen('home')} />
+    return (
+      <>
+        <Progress onBack={() => setScreen('home')} />
+        <BottomNav current="progress" onNavigate={setScreen} />
+      </>
+    )
   }
 
   if (screen === 'vr' && selectedScenario) {
@@ -205,14 +220,16 @@ function App() {
   }
 
   return (
-    <Home
-      onEnterVR={() => setScreen('list')}
-      onOpenMusic={() => setScreen('music')}
-      onOpenUrbanSansa={() => setScreen('urbansansa')}
-      onOpenSOS={() => setScreen('sos')}
-      onOpenCheckIn={() => setScreen('checkin')}
-      onOpenSettings={() => setScreen('settings')}
-    />
+    <>
+      <Home
+        onEnterVR={() => setScreen('list')}
+        onOpenMusic={() => setScreen('music')}
+        onOpenUrbanSansa={() => setScreen('urbansansa')}
+        onOpenCheckIn={() => setScreen('checkin')}
+        onOpenSettings={() => setScreen('settings')}
+      />
+      <BottomNav current="home" onNavigate={setScreen} />
+    </>
   )
 }
 
