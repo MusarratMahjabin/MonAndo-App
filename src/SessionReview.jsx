@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSessions, saveSession, BADGES } from './sessionStore.js'
+import { useNickname } from './useNickname.js'
 
 const HELPER_OPTIONS = ['AI voice', 'Breathing', "Knowing it's VR", 'Repeating']
 
@@ -36,6 +37,7 @@ function BackChevron() {
 }
 
 function SessionReview({ scenario, sudsBefore, onBack, onDone }) {
+  const nickname = useNickname()
   // This session hasn't been saved yet, so an empty history here means
   // it's about to become the user's first. Loaded from Firestore, so it
   // starts false and pops in once we know for sure.
@@ -94,7 +96,7 @@ function SessionReview({ scenario, sudsBefore, onBack, onDone }) {
       </button>
 
       <div className="review-eyebrow">SESSION COMPLETE</div>
-      <h1 className="review-title">You did it.</h1>
+      <h1 className="review-title">You did it{nickname ? `, ${nickname}` : ''}.</h1>
       <h2 className="review-subtitle">How do you feel right now?</h2>
 
       <div className="review-card">

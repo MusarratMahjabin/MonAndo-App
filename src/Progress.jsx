@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSessions } from './sessionStore.js'
+import { useNickname } from './useNickname.js'
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -56,6 +57,7 @@ function moodTone(avg) {
 }
 
 function Progress({ onBack }) {
+  const nickname = useNickname()
   const [loading, setLoading] = useState(true)
   const [days, setDays] = useState(DAY_LETTERS.map((label) => ({ label, avg: null })))
   const [weekAvg, setWeekAvg] = useState(null)
@@ -134,6 +136,8 @@ function Progress({ onBack }) {
       <button className="profile-back" type="button" aria-label="Back" onClick={onBack}>
         <BackChevron />
       </button>
+
+      {nickname && <p className="progress-greeting">Hi, {nickname}</p>}
 
       <h1 className="progress-headline">
         You are <em>becoming</em>.

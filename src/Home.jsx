@@ -1,3 +1,5 @@
+import { useNickname } from './useNickname.js'
+
 function HamburgerIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -11,15 +13,26 @@ function HamburgerIcon() {
   )
 }
 
+function timeOfDayGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 18) return 'Good afternoon'
+  return 'Good evening'
+}
+
 function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenCheckIn, onOpenSettings }) {
+  const nickname = useNickname()
+
   return (
     <div className="home2-screen">
       <div className="home2-topbar">
-        <span className="home2-topbar-logo">MonAndo</span>
+        <img className="home2-topbar-logo" src="/logo.png" alt="MonAndo" />
         <button className="home2-topbar-menu" type="button" aria-label="Settings" onClick={onOpenSettings}>
           <HamburgerIcon />
         </button>
       </div>
+
+      {nickname && <p className="home2-greeting">{timeOfDayGreeting()}, {nickname}</p>}
 
       <h1 className="home2-headline">
         Let's begin

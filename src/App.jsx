@@ -17,6 +17,7 @@ import SOS from './SOS.jsx'
 import CheckIn from './CheckIn.jsx'
 import Settings from './Settings.jsx'
 import Progress from './Progress.jsx'
+import Profile from './Profile.jsx'
 import BottomNav from './BottomNav.jsx'
 import { useAudioPlayer } from './useAudioPlayer.js'
 
@@ -85,11 +86,16 @@ function App() {
     return <ProfileSetup onDone={() => setScreen('checkin')} />
   }
 
+  if (screen === 'profileview') {
+    return <Profile onBack={() => setScreen('settings')} onOpenProgress={() => setScreen('progress')} />
+  }
+
   if (screen === 'settings') {
     return (
       <>
         <Settings
           onBack={() => setScreen('home')}
+          onOpenProfile={() => setScreen('profileview')}
           onLoggedOut={() => {
             setSignedIn(false)
             setScreen('home')

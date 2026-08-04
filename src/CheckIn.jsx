@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { saveCheckIn } from './checkinStore.js'
+import { useNickname } from './useNickname.js'
 
 const MOODS = [
   { id: 'happy', emoji: '😊', label: 'Happy' },
@@ -55,6 +56,7 @@ function todayLabel() {
 }
 
 function CheckIn({ onClose, onContinue }) {
+  const nickname = useNickname()
   const [mood, setMood] = useState(null)
   const [concerns, setConcerns] = useState([])
   const [note, setNote] = useState('')
@@ -90,6 +92,8 @@ function CheckIn({ onClose, onContinue }) {
           <CloseIcon />
         </button>
       </div>
+
+      {nickname && <p className="checkin-greeting">Hi, {nickname}</p>}
 
       <h1 className="checkin-headline">
         How are you

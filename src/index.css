@@ -75,10 +75,14 @@ body {
 }
 
 .home2-topbar-logo {
-  font-family: var(--serif);
-  font-size: 19px;
-  font-weight: 600;
-  color: var(--text-ink);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* logo.png has a solid white background rather than a transparent one —
+     cropping it into a circle keeps that from showing as a stray white
+     square against the app's cream background. */
+  transform: scale(1.35);
 }
 
 .home2-topbar-menu {
@@ -90,6 +94,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.home2-greeting {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-grey);
+  margin: 18px 0 6px;
 }
 
 .home2-headline {
@@ -2042,6 +2055,15 @@ body {
   color: var(--text-headline);
 }
 
+.checkin-greeting {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-grey);
+  margin-bottom: 6px;
+}
+
 .checkin-headline {
   font-family: var(--serif);
   font-size: 32px;
@@ -2540,6 +2562,49 @@ body {
   color: var(--text-ink);
 }
 
+.settings-profile-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: none;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(20, 24, 40, 0.06);
+  cursor: pointer;
+}
+
+.settings-profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tile-periwinkle), #8fb4d6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  flex: 0 0 auto;
+}
+
+.settings-profile-text {
+  flex: 1 1 auto;
+  text-align: left;
+}
+
+.settings-profile-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.settings-profile-view {
+  font-size: 12px;
+  color: var(--text-grey);
+  margin-top: 2px;
+}
+
 .settings-section-label {
   font-size: 11px;
   font-weight: 700;
@@ -2715,6 +2780,15 @@ body {
 
 .progress-screen .profile-back {
   margin-bottom: 20px;
+}
+
+.progress-greeting {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--text-grey);
+  margin-bottom: 6px;
 }
 
 .progress-headline {
@@ -2970,4 +3044,139 @@ body {
 
 .bottomnav-item-sos.bottomnav-item-active {
   background: rgba(242, 112, 92, 0.12);
+}
+
+/* ---------- Profile (view) ---------- */
+
+.profile-view-screen {
+  min-height: 100vh;
+  background: var(--bg-app);
+  padding: 20px 24px 48px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+  text-align: center;
+}
+
+.profile-view-screen .profile-back {
+  text-align: left;
+}
+
+.profile-view-avatar {
+  width: 96px;
+  height: 96px;
+  margin: 24px auto 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tile-periwinkle), #8fb4d6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+}
+
+.profile-view-name {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-headline);
+  margin-bottom: 28px;
+}
+
+.profile-view-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.profile-view-stat {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 16px 8px;
+  box-shadow: 0 1px 4px rgba(20, 24, 40, 0.06);
+}
+
+.profile-view-stat-value {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-headline);
+}
+
+.profile-view-stat-label {
+  font-size: 11.5px;
+  color: var(--text-grey);
+  margin-top: 4px;
+}
+
+.profile-view-section-label {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-headline);
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.profile-view-empty {
+  text-align: left;
+  font-size: 13.5px;
+  color: var(--text-grey);
+  margin-bottom: 24px;
+}
+
+.profile-view-badges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.profile-view-badge {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 16px 8px;
+  box-shadow: 0 1px 4px rgba(20, 24, 40, 0.06);
+}
+
+.profile-view-badge-emoji {
+  font-size: 22px;
+}
+
+.profile-view-badge-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-ink);
+  margin-top: 6px;
+}
+
+.profile-view-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(20, 24, 40, 0.06);
+  cursor: pointer;
+}
+
+.profile-view-link-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--tile-periwinkle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex: 0 0 auto;
+}
+
+.profile-view-link-text {
+  flex: 1 1 auto;
+  text-align: left;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-ink);
 }

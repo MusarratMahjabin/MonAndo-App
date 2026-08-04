@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import urbanSansaFeatures from './urbanSansaFeatures.js'
+import { useNickname } from './useNickname.js'
 
 const WEATHER_OPTIONS = [
   { id: 'sunny', emoji: '☀️', label: 'Sunny' },
@@ -31,6 +32,7 @@ function formatDuration(seconds) {
 
 function UrbanSansa({ onBack, onOpenFeature }) {
   const [weather, setWeather] = useState(null)
+  const nickname = useNickname()
   const featured = urbanSansaFeatures[0]
 
   return (
@@ -43,7 +45,7 @@ function UrbanSansa({ onBack, onOpenFeature }) {
       </div>
 
       <h1 className="us-greeting">
-        Good day, <strong>User</strong>
+        Good day, <strong>{nickname || 'friend'}</strong>
       </h1>
       <p className="us-subtitle">Mental well-being is mental health.</p>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { isGuestAccount, signOutUser } from './firebase.js'
+import { useNickname } from './useNickname.js'
 
 function BackChevron() {
   return (
@@ -8,6 +9,20 @@ function BackChevron() {
         d="M11.5 3.5L6 9L11.5 14.5"
         stroke="currentColor"
         strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+function ChevronRight() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M6 3.5L10.5 8L6 12.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -33,10 +48,11 @@ function SettingsRow({ icon, iconBg, title, subtitle, trailing }) {
   )
 }
 
-function Settings({ onBack, onLoggedOut }) {
+function Settings({ onBack, onOpenProfile, onLoggedOut }) {
   const [confirmingLogOut, setConfirmingLogOut] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [error, setError] = useState('')
+  const nickname = useNickname()
 
   const isGuest = isGuestAccount()
 
@@ -66,6 +82,15 @@ function Settings({ onBack, onLoggedOut }) {
         </button>
         <h1 className="settings-title">Settings</h1>
       </div>
+
+      <button className="settings-profile-row" type="button" onClick={onOpenProfile}>
+        <span className="settings-profile-avatar">🌙</span>
+        <div className="settings-profile-text">
+          <div className="settings-profile-name">{nickname || 'Anonymous'}</div>
+          <div className="settings-profile-view">View profile</div>
+        </div>
+        <ChevronRight />
+      </button>
 
       <div className="settings-section-label">Personalization</div>
       <div className="settings-card">
