@@ -20,6 +20,7 @@ const scenarios = [
     aiContext: 'The user is standing at the front and about to give a presentation, classmates watching',
     aiFallbackLines: {
       opening: "You're standing where you meant to stand. That's already something.",
+      middle: "Their eyes are on the slides as much as you. Keep going.",
       closing: 'You stayed at the front the whole time. Notice that.',
     },
   },
@@ -37,6 +38,7 @@ const scenarios = [
     aiContext: 'The user is seated at a desk in a silent exam hall, about to begin a timed exam.',
     aiFallbackLines: {
       opening: 'The quiet before it starts is often the loudest part. Breathe.',
+      middle: 'The clock is doing its job. So are you, one question at a time.',
       closing: 'You sat through the silence and the pressure both. Notice that.',
     },
   },
@@ -53,6 +55,7 @@ const scenarios = [
     aiContext: 'The user is seated in the economy class of a commercial airplane preparing for takeoff, experiencing engine noises, mild vibrations, and standard cabin announcements.',
     aiFallbackLines: {
       opening: "That vibration is the engine, not a warning. You're okay.",
+      middle: "You're above it now, steady in your seat. The hum is just noise.",
       closing: 'You stayed in your seat through takeoff. That took something real.',
     },
   },
@@ -69,6 +72,7 @@ const scenarios = [
     aiContext: 'The user is standing inside a moving, moderately crowded public city bus, holding onto a handrail while passengers board and disembark at various stops.',
     aiFallbackLines: {
       opening: 'Hold the rail. Let the movement be movement, nothing more.',
+      middle: "People get on and off around you. You don't have to track them all.",
       closing: "You rode the whole way standing. Notice you're still steady.",
     },
   },
@@ -85,6 +89,7 @@ const scenarios = [
     aiContext: 'The user is sitting across a desk from a hiring manager in a quiet corporate office, being asked a series of professional questions in a formal interview setting.',
     aiFallbackLines: {
       opening: "Sit back in the chair. You're allowed a breath before answering.",
+      middle: "One question at a time. You don't owe them a perfect answer.",
       closing: "You sat across from them and stayed. That's the win here.",
     },
   },
@@ -101,6 +106,7 @@ const scenarios = [
     aiContext: 'The user is resting in a peaceful, lush green forest clearing near a gentle stream, surrounded by calming nature sounds, birdsong, and soft sunlight.',
     aiFallbackLines: {
       opening: 'Nothing is asked of you here. Just let your shoulders drop.',
+      middle: 'The stream keeps moving so you don\'t have to. Just rest here.',
       closing: 'This calm is yours to return to, whenever you need it.',
     },
   },
@@ -117,6 +123,7 @@ const scenarios = [
     aiContext: 'The user is navigating through a bustling downtown pedestrian street during rush hour, surrounded by people walking quickly in all directions and ambient city noise.',
     aiFallbackLines: {
       opening: "The crowd has its own current. You don't have to fight it.",
+      middle: 'Let the noise stay in the background. Your next step is what matters.',
       closing: 'You moved through it at your own pace. That matters.',
     },
   },

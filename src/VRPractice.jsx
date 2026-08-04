@@ -98,6 +98,20 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
     return () => video.removeEventListener('playing', hideOverlay)
   }, [scenario.videoUrl, sceneReady])
 
+  // A scene plays exactly once, then moves straight on to Session Review
+  // — no auto-replay. (The video element itself has no `loop` attribute;
+  // this is what actually ends the session on the real final frame.)
+  useEffect(() => {
+    if (!scenario.videoUrl || !sceneReady) return
+
+    const video = videoRef.current
+    if (!video) return
+
+    const handleEnded = () => onExit()
+    video.addEventListener('ended', handleEnded, { once: true })
+    return () => video.removeEventListener('ended', handleEnded)
+  }, [scenario.videoUrl, sceneReady, onExit])
+
   // AI voice companion: speaks one short supportive line right away, then
   // again every 25-30s for the rest of the session, tone evolving through
   // the opening/middle/closing phases. While each line is playing, the
@@ -204,10 +218,10 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
       if (flagged) return { type: 'flag' }
 
       // Guaranteed backup, used whenever the live Gemini call itself fails
-      // or times out. Opening/closing get the scenario-specific line;
-      // mid-session has no scenario-specific line, so it goes straight to
-      // the browser-voice backup. Either way, the companion never goes
-      // completely silent.
+      // or times out. Every scenario has a hand-written line for all three
+      // phases (opening/middle/closing), so this stays scenario-specific
+      // even on a Gemini failure — the fully generic pool below is only
+      // for the (should-be-rare) case where a scenario is missing one.
       if (!text) {
         text = scenario.aiFallbackLines?.[phase]
         isFallback = true
@@ -227,14 +241,18 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
         if (!response.ok) {
           const errBody = await response.text().catch(() => '')
           console.error('ElevenLabs request failed:', response.status, errBody)
-          return { type: 'browser', text: pickBackupLine() }
+          // Voice synthesis failed, but the LINE itself is still good
+          // (scenario-specific, from Gemini or the scenario's own
+          // fallback) — speak that via the browser voice rather than
+          // discarding it for one of the fully generic lines.
+          return { type: 'browser', text }
         }
         const blob = await response.blob()
         const url = URL.createObjectURL(blob)
         return { type: 'audio', url, text, isFallback }
       } catch (err) {
         console.error('ElevenLabs request failed:', err)
-        return { type: 'browser', text: pickBackupLine() }
+        return { type: 'browser', text }
       }
     }
 
@@ -403,7 +421,6 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
             ref={videoRef}
             src={scenario.videoUrl}
             preload="auto"
-            loop
             playsInline
             webkit-playsinline="true"
             crossOrigin="anonymous"
