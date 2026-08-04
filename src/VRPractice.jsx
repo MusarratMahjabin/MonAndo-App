@@ -99,7 +99,7 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
   }, [scenario.videoUrl, sceneReady])
 
   // AI voice companion: speaks one short supportive line right away, then
-  // again every 50-60s for the rest of the session, tone evolving through
+  // again every 25-30s for the rest of the session, tone evolving through
   // the opening/middle/closing phases. While each line is playing, the
   // NEXT line is already being generated in the background (text + audio),
   // so there's no generation delay — no silent gap — when its turn comes.
@@ -112,6 +112,14 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
     let currentAudio = null
     let timerId = null
     let preparedNext = null // a Promise for the line after the one about to play
+
+    // Wall-clock elapsed time, not video.currentTime — some scenario videos
+    // loop well before their configured durationMinutes is up (one measured
+    // at well under a second of actual footage), which would otherwise
+    // reset the "elapsed" the companion uses for opening/middle/closing
+    // constantly, instead of just once near the real end of the session.
+    const sessionStartMs = Date.now()
+    const elapsedSeconds = () => (Date.now() - sessionStartMs) / 1000
 
     // Only one companion voice should ever be audible at once — stop
     // whichever mechanism (ElevenLabs audio or the browser voice) is
@@ -153,31 +161,44 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
       let isFallback = false
       let flagged = false
 
-      try {
-        const response = await fetchWithTimeout(
-          '/api/companion',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              scenarioTitle: scenario.title,
-              scenarioContext: scenario.aiContext,
-              difficulty: scenario.difficulty,
-              elapsedSeconds,
-              durationMinutes: scenario.durationMinutes,
-            }),
-          },
-          COMPANION_FETCH_TIMEOUT_MS,
-        )
-        if (response.ok) {
-          const data = await response.json()
-          if (data.flagged) flagged = true
-          else if (data.line) text = data.line
-        } else {
+      // Gemini occasionally returns 502/503/429 for a moment (e.g. "model
+      // is currently experiencing high demand") that usually clears within
+      // a couple of seconds — one quick retry avoids falling back to a
+      // generic line for what's often just a brief blip.
+      for (let attempt = 0; attempt < 2; attempt++) {
+        if (cancelled) break
+        try {
+          const response = await fetchWithTimeout(
+            '/api/companion',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                scenarioTitle: scenario.title,
+                scenarioContext: scenario.aiContext,
+                difficulty: scenario.difficulty,
+                elapsedSeconds,
+                durationMinutes: scenario.durationMinutes,
+              }),
+            },
+            COMPANION_FETCH_TIMEOUT_MS,
+          )
+          if (response.ok) {
+            const data = await response.json()
+            if (data.flagged) flagged = true
+            else if (data.line) text = data.line
+            break
+          }
           console.error('AI companion request failed:', response.status)
+          if (attempt === 0 && [429, 502, 503].includes(response.status)) {
+            await new Promise((resolve) => setTimeout(resolve, 1200))
+            continue
+          }
+          break
+        } catch (err) {
+          console.error('AI companion request failed:', err)
+          break
         }
-      } catch (err) {
-        console.error('AI companion request failed:', err)
       }
 
       if (flagged) return { type: 'flag' }
@@ -252,8 +273,7 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
 
     const cycle = async () => {
       if (cancelled) return
-      const video = videoRef.current
-      const nowElapsed = video ? video.currentTime : 0
+      const nowElapsed = elapsedSeconds()
 
       const prepared = preparedNext ? await preparedNext : await prepareLine(nowElapsed)
       preparedNext = null

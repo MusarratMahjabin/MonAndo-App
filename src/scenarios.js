@@ -76,7 +76,7 @@ const scenarios = [
     durationMinutes: 3,
     emoji: '💼',
     thumbnailUrl: 'https://res.cloudinary.com/lszcugmx/image/upload/v1785559429/IMG_8785_pdwbdn.png',
-    videoUrl: 'https://res.cloudinary.com/lszcugmx/video/upload/v1785558976/360_VR_Job_Interview_Demo_-_Prototype_-_Socius_XR_1080p_h264_aalotw.mp4',
+    videoUrl: 'https://res.cloudinary.com/lszcugmx/video/upload/q_auto/v1785558976/360_VR_Job_Interview_Demo_-_Prototype_-_Socius_XR_1080p_h264_aalotw.mp4',
     aiContext: 'The user is sitting across a desk from a hiring manager in a quiet corporate office, being asked a series of professional questions in a formal interview setting.',
     aiFallbackLines: {
       opening: "Sit back in the chair. You're allowed a breath before answering.",
