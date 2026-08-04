@@ -47,7 +47,7 @@ function PauseIcon() {
   )
 }
 
-function MusicLibrary({ onBack, onOpenTrack, currentTrack, isPlaying }) {
+function MusicLibrary({ onBack, onOpenTrack, onToggleTrack, currentTrack, isPlaying }) {
   const [filter, setFilter] = useState('Calm')
 
   const visible = audioTracks.filter((track) => {
@@ -88,44 +88,52 @@ function MusicLibrary({ onBack, onOpenTrack, currentTrack, isPlaying }) {
 
       <div className="music-list">
         {visible.map((track) => {
-          const active = currentTrack?.id === track.id && isPlaying
+          const isCurrent = currentTrack?.id === track.id
+          const active = isCurrent && isPlaying
           return (
-            <button
-              key={track.id}
-              className="music-card"
-              type="button"
-              onClick={() => onOpenTrack(track)}
-            >
-              <span className="music-card-icon" style={{ background: track.coverColor }}>
-                {CATEGORY_ICON[track.category] ?? '🎵'}
-              </span>
-              <span className="music-card-info">
-                <span className="music-card-title">{track.title}</span>
-                <span className="music-card-meta">
-                  {track.category} · {formatDuration(track.durationSeconds)}
+            <div key={track.id} className="music-card">
+              <button className="music-card-main" type="button" onClick={() => onOpenTrack(track)}>
+                <span className="music-card-icon" style={{ background: track.coverColor }}>
+                  {CATEGORY_ICON[track.category] ?? '🎵'}
                 </span>
-              </span>
-              <span className={`music-card-toggle ${active ? 'music-card-toggle-active' : ''}`}>
+                <span className="music-card-info">
+                  <span className="music-card-title">{track.title}</span>
+                  <span className="music-card-meta">
+                    {track.category} · {formatDuration(track.durationSeconds)}
+                  </span>
+                </span>
+              </button>
+              <button
+                className={`music-card-toggle ${active ? 'music-card-toggle-active' : ''}`}
+                type="button"
+                aria-label={active ? 'Pause' : 'Play'}
+                onClick={() => (isCurrent ? onToggleTrack(track) : onOpenTrack(track))}
+              >
                 {active ? <PauseIcon /> : <PlayIcon />}
-              </span>
-            </button>
+              </button>
+            </div>
           )
         })}
       </div>
 
       {currentTrack && (
-        <button
-          className="music-mini-player"
-          type="button"
-          onClick={() => onOpenTrack(currentTrack)}
-        >
-          <span className="music-mini-swatch" style={{ background: currentTrack.coverColor }} />
-          <span className="music-mini-info">
-            <span className="music-mini-label">Now playing</span>
-            <span className="music-mini-title">{currentTrack.title}</span>
-          </span>
-          <span className="music-mini-toggle">{isPlaying ? <PauseIcon /> : <PlayIcon />}</span>
-        </button>
+        <div className="music-mini-player">
+          <button className="music-mini-main" type="button" onClick={() => onOpenTrack(currentTrack)}>
+            <span className="music-mini-swatch" style={{ background: currentTrack.coverColor }} />
+            <span className="music-mini-info">
+              <span className="music-mini-label">Now playing</span>
+              <span className="music-mini-title">{currentTrack.title}</span>
+            </span>
+          </button>
+          <button
+            className="music-mini-toggle"
+            type="button"
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+            onClick={() => onToggleTrack(currentTrack)}
+          >
+            {isPlaying ? <PauseIcon /> : <PlayIcon />}
+          </button>
+        </div>
       )}
     </div>
   )

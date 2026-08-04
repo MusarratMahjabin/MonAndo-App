@@ -20,7 +20,7 @@ function timeOfDayGreeting() {
   return 'Good evening'
 }
 
-function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenCheckIn, onOpenSettings }) {
+function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenCheckIn, onOpenSettings, onOpenReflect }) {
   const nickname = useNickname()
 
   return (
@@ -90,11 +90,15 @@ function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenCheckIn, onOpenS
           <div className="home2-tile-sub">Your own temple in the city</div>
         </button>
 
-        <div className="home2-tile grain home2-tile-periwinkle">
+        <button
+          className="home2-tile grain home2-tile-periwinkle"
+          type="button"
+          onClick={onOpenReflect}
+        >
           <span className="home2-tile-icon">💬</span>
           <div className="home2-tile-title">Reflect</div>
           <div className="home2-tile-sub">A question, not advice</div>
-        </div>
+        </button>
       </div>
     </div>
   )

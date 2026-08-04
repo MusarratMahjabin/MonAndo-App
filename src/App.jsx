@@ -18,6 +18,7 @@ import CheckIn from './CheckIn.jsx'
 import Settings from './Settings.jsx'
 import Progress from './Progress.jsx'
 import Profile from './Profile.jsx'
+import AICounsel from './AICounsel.jsx'
 import BottomNav from './BottomNav.jsx'
 import { useAudioPlayer } from './useAudioPlayer.js'
 
@@ -136,6 +137,12 @@ function App() {
     )
   }
 
+  if (screen === 'reflect') {
+    return (
+      <AICounsel onBack={() => setScreen('home')} onFlagDistress={() => setScreen('sos')} />
+    )
+  }
+
   if (screen === 'urbansansa') {
     return (
       <UrbanSansa
@@ -150,6 +157,7 @@ function App() {
       <MusicLibrary
         onBack={() => setScreen('home')}
         onOpenTrack={openTrack}
+        onToggleTrack={toggle}
         currentTrack={currentTrack}
         isPlaying={isPlaying}
       />
@@ -233,6 +241,7 @@ function App() {
         onOpenUrbanSansa={() => setScreen('urbansansa')}
         onOpenCheckIn={() => setScreen('checkin')}
         onOpenSettings={() => setScreen('settings')}
+        onOpenReflect={() => setScreen('reflect')}
       />
       <BottomNav current="home" onNavigate={setScreen} />
     </>

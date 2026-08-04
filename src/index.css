@@ -699,15 +699,26 @@ body {
 .music-card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  border: none;
-  cursor: pointer;
-  text-align: left;
+  gap: 8px;
   background: var(--bg-card);
   border-radius: 18px;
   padding: 12px;
   font-family: var(--sans);
   box-shadow: 0 2px 10px rgba(20, 24, 40, 0.05);
+}
+
+.music-card-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  font-family: var(--sans);
 }
 
 .music-card-icon {
@@ -744,12 +755,14 @@ body {
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
+  border: none;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-headline);
   background: var(--bg-app);
+  cursor: pointer;
 }
 
 .music-card-toggle-active {
@@ -764,14 +777,25 @@ body {
   bottom: 24px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  border: none;
-  cursor: pointer;
-  text-align: left;
+  gap: 8px;
   background: var(--bg-card);
   border-radius: 16px;
   padding: 10px 12px;
   box-shadow: 0 10px 26px rgba(20, 24, 40, 0.14);
+  font-family: var(--sans);
+}
+
+.music-mini-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
   font-family: var(--sans);
 }
 
@@ -807,9 +831,11 @@ body {
   flex: 0 0 auto;
   width: 34px;
   height: 34px;
+  border: none;
   border-radius: 10px;
   background: var(--text-headline);
   color: var(--text-on-dark);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3222,4 +3248,194 @@ body {
   font-size: 14.5px;
   font-weight: 600;
   color: var(--text-ink);
+}
+
+/* ---------- Reflect (AI Counsel) ---------- */
+
+.counsel-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-app);
+  padding: 20px 24px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+}
+
+.counsel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.counsel-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-headline);
+}
+
+.counsel-subtitle {
+  font-size: 13px;
+  color: var(--text-grey);
+  margin: 4px 0 18px;
+}
+
+.counsel-chat {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 12px;
+}
+
+.counsel-bubble {
+  max-width: 80%;
+  padding: 12px 15px;
+  border-radius: 18px;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+.counsel-bubble-assistant {
+  align-self: flex-start;
+  background: var(--bg-card);
+  color: var(--text-ink);
+  box-shadow: 0 1px 4px rgba(20, 24, 40, 0.06);
+  border-bottom-left-radius: 6px;
+}
+
+.counsel-bubble-user {
+  align-self: flex-end;
+  background: var(--tile-periwinkle);
+  color: var(--text-on-dark, #fff);
+  border-bottom-right-radius: 6px;
+}
+
+.counsel-bubble-loading {
+  color: var(--text-grey);
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.counsel-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.counsel-input {
+  flex: 1 1 auto;
+  border: 1.5px solid rgba(26, 26, 26, 0.12);
+  border-radius: 999px;
+  padding: 13px 18px;
+  font-family: var(--sans);
+  font-size: 14.5px;
+  color: var(--text-ink);
+  background: var(--bg-card);
+}
+
+.counsel-input:focus {
+  outline: none;
+  border-color: var(--tile-periwinkle);
+}
+
+.counsel-input:disabled {
+  opacity: 0.6;
+}
+
+.counsel-send {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tile-periwinkle);
+  color: var(--text-on-dark, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.counsel-send:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.counsel-end {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.counsel-score-ring {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 14px;
+}
+
+.counsel-score-ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.counsel-score-ring circle {
+  transition: stroke-dasharray 1s ease;
+}
+
+.counsel-score-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-headline);
+}
+
+.counsel-score-caption {
+  font-size: 12px;
+  color: var(--text-grey);
+  margin-bottom: 24px;
+}
+
+.counsel-end-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-headline);
+  margin-bottom: 12px;
+}
+
+.counsel-end-summary {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-grey);
+  margin-bottom: 32px;
+  max-width: 320px;
+}
+
+.counsel-done-btn {
+  width: 100%;
+  max-width: 320px;
+  border: none;
+  border-radius: 999px;
+  padding: 16px;
+  background: var(--text-headline);
+  color: var(--text-on-dark);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
 }
