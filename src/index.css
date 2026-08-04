@@ -2932,10 +2932,10 @@ body {
   z-index: 20;
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: 68px;
-  padding: 0 14px;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  gap: 4px;
+  height: 72px;
+  padding: 8px 10px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
   background: var(--bg-card);
   border-top: 1px solid rgba(26, 26, 26, 0.08);
   box-shadow: 0 -2px 12px rgba(20, 24, 40, 0.06);
@@ -2950,6 +2950,7 @@ body {
   gap: 3px;
   height: 100%;
   border: none;
+  border-radius: 14px;
   background: none;
   color: var(--text-grey);
   font-family: var(--sans);
@@ -2960,27 +2961,13 @@ body {
 
 .bottomnav-item-active {
   color: var(--text-headline);
+  background: rgba(27, 58, 92, 0.08);
 }
 
-.bottomnav-sos {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: none;
-  background: var(--sos-coral, #f2705c);
-  color: #fff;
-  font-family: var(--sans);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  cursor: pointer;
-  box-shadow: 0 8px 18px rgba(242, 112, 92, 0.4);
+.bottomnav-item-sos {
+  color: var(--sos-coral, #f2705c);
 }
 
-.bottomnav-sos-active {
-  box-shadow: 0 0 0 3px rgba(242, 112, 92, 0.3), 0 8px 18px rgba(242, 112, 92, 0.4);
+.bottomnav-item-sos.bottomnav-item-active {
+  background: rgba(242, 112, 92, 0.12);
 }

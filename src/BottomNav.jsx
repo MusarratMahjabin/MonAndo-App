@@ -39,34 +39,44 @@ function ProgressIcon() {
   )
 }
 
+function SosIcon() {
+  return (
+    <svg width="21" height="21" viewBox="0 0 21 21" fill="none">
+      <path
+        d="M10.5 3L18.5 17H2.5L10.5 3z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path d="M10.5 8.5v3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="10.5" cy="14.3" r="0.9" fill="currentColor" />
+    </svg>
+  )
+}
+
 const TABS = [
   { id: 'home', label: 'Home', Icon: HomeIcon },
   { id: 'settings', label: 'Settings', Icon: SettingsIcon },
   { id: 'progress', label: 'Progress', Icon: ProgressIcon },
+  { id: 'sos', label: 'SOS', Icon: SosIcon, isSos: true },
 ]
 
 function BottomNav({ current, onNavigate }) {
   return (
     <nav className="bottomnav">
-      {TABS.map(({ id, label, Icon }) => (
+      {TABS.map(({ id, label, Icon, isSos }) => (
         <button
           key={id}
           type="button"
-          className={`bottomnav-item ${current === id ? 'bottomnav-item-active' : ''}`}
+          className={`bottomnav-item ${isSos ? 'bottomnav-item-sos' : ''} ${
+            current === id ? 'bottomnav-item-active' : ''
+          }`}
           onClick={() => onNavigate(id)}
         >
           <Icon />
           <span>{label}</span>
         </button>
       ))}
-
-      <button
-        type="button"
-        className={`bottomnav-sos ${current === 'sos' ? 'bottomnav-sos-active' : ''}`}
-        onClick={() => onNavigate('sos')}
-      >
-        SOS
-      </button>
     </nav>
   )
 }
