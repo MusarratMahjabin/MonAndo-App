@@ -22,6 +22,23 @@ function DownChevron() {
   )
 }
 
+function PlayIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor">
+      <path d="M6 3.5L18 11L6 18.5V3.5Z" />
+    </svg>
+  )
+}
+
+function PauseIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor">
+      <rect x="5" y="3.5" width="4" height="15" rx="1" />
+      <rect x="13" y="3.5" width="4" height="15" rx="1" />
+    </svg>
+  )
+}
+
 function NowPlaying({ track, onCollapse, isPlaying, onToggleAudio, onStopAudio }) {
   if (track.category === 'Meditation') {
     return (
@@ -62,6 +79,22 @@ function NowPlaying({ track, onCollapse, isPlaying, onToggleAudio, onStopAudio }
           <DownChevron />
         </button>
         <span className="nowplaying-category">{track.category}</span>
+      </div>
+
+      <div className="nowplaying-info">
+        <h1 className="nowplaying-title">{track.title}</h1>
+        <p className="nowplaying-artist">{track.artist}</p>
+      </div>
+
+      <div className="nowplaying-controls">
+        <button
+          className="nowplaying-play"
+          type="button"
+          onClick={() => onToggleAudio?.()}
+          aria-label={isPlaying ? 'Pause' : 'Play'}
+        >
+          {isPlaying ? <PauseIcon /> : <PlayIcon />}
+        </button>
       </div>
     </div>
   )

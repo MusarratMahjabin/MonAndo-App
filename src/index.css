@@ -877,6 +877,54 @@ body {
   color: var(--text-on-dark);
 }
 
+.nowplaying-info {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 140px);
+  z-index: 2;
+  text-align: center;
+}
+
+.nowplaying-title {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-on-dark);
+  margin-bottom: 6px;
+}
+
+.nowplaying-artist {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: rgba(245, 241, 232, 0.75);
+}
+
+.nowplaying-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 44px);
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.nowplaying-play {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(6px);
+  color: var(--text-on-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
 /* ---------- Breathing Session (meditation "lyrics" screen) ---------- */
 
 .breathing-screen {

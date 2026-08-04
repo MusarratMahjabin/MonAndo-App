@@ -53,7 +53,24 @@ export function useAudioPlayer() {
     audio
       .play()
       .then(() => setIsPlaying(true))
-      .catch(() => setIsPlaying(false))
+      .catch((err) => {
+        // Mobile browsers sometimes block a play() call that isn't tied
+        // tightly enough to the tap that triggered it (e.g. switching
+        // tracks), even though the page already has audio permission from
+        // an earlier tap this session. If that happens, don't just give
+        // up silently — retry the instant the user next taps anywhere.
+        console.error('Could not play track, will retry on next tap:', err)
+        setIsPlaying(false)
+        const retryPlay = () => {
+          if (audioRef.current === audio) {
+            audio
+              .play()
+              .then(() => setIsPlaying(true))
+              .catch(() => {})
+          }
+        }
+        document.addEventListener('pointerdown', retryPlay, { once: true })
+      })
   }, [])
 
   const pause = useCallback(() => {
