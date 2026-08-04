@@ -3,10 +3,10 @@
 // ============================================================
 // Saves each daily mood check-in (mood, concern tags, optional note)
 // to Firestore, scoped to this device's signed-in (anonymous) account.
-// This is the history the future mood-analysis feature will read from.
+// Read back by the Home screen's mood-based recommendation.
 // ============================================================
 
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp } from 'firebase/firestore'
 import { db, ensureAuth } from './firebase.js'
 
 export async function saveCheckIn({ mood, concerns, note }) {
@@ -17,4 +17,16 @@ export async function saveCheckIn({ mood, concerns, note }) {
     note: note || '',
     createdAt: serverTimestamp(),
   })
+}
+
+// Most recent check-ins, newest first.
+export async function getRecentCheckIns(count = 5) {
+  const uid = await ensureAuth()
+  const q = query(
+    collection(db, 'users', uid, 'checkins'),
+    orderBy('createdAt', 'desc'),
+    limit(count),
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map((doc) => doc.data())
 }

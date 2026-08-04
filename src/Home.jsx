@@ -1,4 +1,5 @@
 import { useNickname } from './useNickname.js'
+import { useHomeRecommendation } from './recommend.js'
 
 function HamburgerIcon() {
   return (
@@ -20,8 +21,24 @@ function timeOfDayGreeting() {
   return 'Good evening'
 }
 
-function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenCheckIn, onOpenSettings, onOpenReflect }) {
+function Home({
+  onEnterVR,
+  onOpenMusic,
+  onOpenUrbanSansa,
+  onOpenCheckIn,
+  onOpenSettings,
+  onOpenReflect,
+  onSelectScenario,
+  onOpenTrack,
+}) {
   const nickname = useNickname()
+  const recommendation = useHomeRecommendation()
+
+  const openRecommendation = () => {
+    if (recommendation.type === 'vr') onSelectScenario(recommendation.scenario)
+    else if (recommendation.type === 'music') onOpenTrack(recommendation.track)
+    else if (recommendation.type === 'urbansansa') onOpenUrbanSansa()
+  }
 
   return (
     <div className="home2-screen">
@@ -45,16 +62,16 @@ function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenCheckIn, onOpenS
         How are you feeling today? →
       </button>
 
-      <button className="home2-pick-card grain" type="button" onClick={onEnterVR}>
-        <div className="home2-pick-label">✦ NOW RECOMMENDED</div>
-        <div className="home2-pick-title">Classroom Talk</div>
-        <p className="home2-pick-desc">
-          Practice answering when called on. Gentle, kind, judgement-free.
-        </p>
+      <button className="home2-pick-card grain" type="button" onClick={openRecommendation}>
+        <div className="home2-pick-label">{recommendation.label}</div>
+        <div className="home2-pick-title">{recommendation.title}</div>
+        <p className="home2-pick-desc">{recommendation.desc}</p>
         <div className="home2-pick-pills">
-          <span className="home2-pill">VR</span>
-          <span className="home2-pill">Easy</span>
-          <span className="home2-pill">8 min</span>
+          {recommendation.pills.map((pill) => (
+            <span className="home2-pill" key={pill}>
+              {pill}
+            </span>
+          ))}
           <span className="home2-pill home2-pill-arrow">→</span>
         </div>
       </button>

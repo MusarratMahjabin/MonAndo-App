@@ -246,6 +246,11 @@ function App() {
         onOpenCheckIn={() => setScreen('checkin')}
         onOpenSettings={() => setScreen('settings')}
         onOpenReflect={() => setScreen('reflect')}
+        onSelectScenario={(scenario) => {
+          setSelectedScenario(scenario)
+          setScreen('hardware')
+        }}
+        onOpenTrack={(track) => openTrack(track, 'home')}
       />
       <BottomNav current="home" onNavigate={setScreen} />
     </>
