@@ -77,12 +77,7 @@ body {
 .home2-topbar-logo {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  /* logo.png has a solid white background rather than a transparent one —
-     cropping it into a circle keeps that from showing as a stray white
-     square against the app's cream background. */
-  transform: scale(1.35);
+  object-fit: contain;
 }
 
 .home2-topbar-menu {

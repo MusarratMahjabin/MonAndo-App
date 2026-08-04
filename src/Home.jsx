@@ -26,7 +26,7 @@ function Home({ onEnterVR, onOpenMusic, onOpenUrbanSansa, onOpenCheckIn, onOpenS
   return (
     <div className="home2-screen">
       <div className="home2-topbar">
-        <img className="home2-topbar-logo" src="/logo.png" alt="MonAndo" />
+        <img className="home2-topbar-logo" src="/logo%20transparent.png" alt="MonAndo" />
         <button className="home2-topbar-menu" type="button" aria-label="Settings" onClick={onOpenSettings}>
           <HamburgerIcon />
         </button>
