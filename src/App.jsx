@@ -88,7 +88,12 @@ function App() {
   }
 
   if (screen === 'profileview') {
-    return <Profile onBack={() => setScreen('settings')} onOpenProgress={() => setScreen('progress')} />
+    return (
+      <>
+        <Profile onBack={() => setScreen('home')} onOpenProgress={() => setScreen('progress')} />
+        <BottomNav current="profileview" onNavigate={setScreen} />
+      </>
+    )
   }
 
   if (screen === 'settings') {
@@ -145,22 +150,28 @@ function App() {
 
   if (screen === 'urbansansa') {
     return (
-      <UrbanSansa
-        onBack={() => setScreen('home')}
-        onOpenFeature={(feature) => openTrack(feature, 'urbansansa')}
-      />
+      <>
+        <UrbanSansa
+          onBack={() => setScreen('home')}
+          onOpenFeature={(feature) => openTrack(feature, 'urbansansa')}
+        />
+        <BottomNav current="urbansansa" onNavigate={setScreen} />
+      </>
     )
   }
 
   if (screen === 'music') {
     return (
-      <MusicLibrary
-        onBack={() => setScreen('home')}
-        onOpenTrack={openTrack}
-        onToggleTrack={toggle}
-        currentTrack={currentTrack}
-        isPlaying={isPlaying}
-      />
+      <>
+        <MusicLibrary
+          onBack={() => setScreen('home')}
+          onOpenTrack={openTrack}
+          onToggleTrack={toggle}
+          currentTrack={currentTrack}
+          isPlaying={isPlaying}
+        />
+        <BottomNav current="music" onNavigate={setScreen} />
+      </>
     )
   }
 
@@ -223,13 +234,16 @@ function App() {
 
   if (screen === 'list') {
     return (
-      <VRLibrary
-        onBack={() => setScreen('home')}
-        onSelect={(scenario) => {
-          setSelectedScenario(scenario)
-          setScreen('hardware')
-        }}
-      />
+      <>
+        <VRLibrary
+          onBack={() => setScreen('home')}
+          onSelect={(scenario) => {
+            setSelectedScenario(scenario)
+            setScreen('hardware')
+          }}
+        />
+        <BottomNav current="list" onNavigate={setScreen} />
+      </>
     )
   }
 
