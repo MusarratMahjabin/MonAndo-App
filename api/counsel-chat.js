@@ -2,29 +2,43 @@
 // AI Reflect — chat round (Vercel Function)
 // ============================================================
 // Powers one exchange of the "Reflect" feature's guided, 4-round
-// conversation. Runs only on Vercel's servers — GEMINI_API_KEY never
-// reaches the browser.
+// Socratic conversation. Runs only on Vercel's servers -- GEMINI_API_KEY
+// never reaches the browser.
 //
 // Request body:
 //   { "history": [{ "role": "user"|"assistant", "content": "..." }],
 //     "round": 0 }
 // Response body:
-//   { "message": "...", "round": 1, "done": false, "flagged": false }
+//   { "ai_message": "...", "round": 1, "done": false, "flagged": false }
 //   or, if the user's own message suggests real crisis:
-//   { "message": null, "round": 0, "done": false, "flagged": true }
+//   { "ai_message": null, "round": 0, "done": false, "flagged": true }
 // ============================================================
 
 const GEMINI_URL =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent'
 
-const MAX_WORDS = 30
-const TOTAL_ROUNDS = 4
+const SYSTEM_PROMPT = `You are a calm, supportive wellness companion for MonAndo.
+You are NOT a therapist, doctor, or counselor. Never claim that role.
+Rules:
+- Never diagnose. Never use clinical or medical words.
+- Never give medical or psychiatric advice.
+- Speak to the present moment, plainly and warmly.
+- Maximum 30 words per response. Simple, spoken-like language.
+- Always end with exactly ONE warm, probing question.
+- Use the Socratic method: guide the user to reflect, do not give answers.
+
+Round structure:
+1. Greeting: Warmly greet and ask what happened today.
+2. Emotion: Acknowledge their situation, ask what emotions they felt.
+3. Solution: Ask if they have past experience or late-coming ideas to handle it.
+4. Summary: After round 3 user response, summarize their insights and close warmly. NO question.`
+
 const ROUND_NAMES = ['greeting', 'emotion', 'solution', 'summary']
 
 // Checked directly against what the USER types, before ever calling
-// Gemini — deterministic and instant, not dependent on the model
+// Gemini -- deterministic and instant, not dependent on the model
 // correctly noticing risk in free-form conversation. Mirrors the same
-// crisis keywords the mood check-in already screens for.
+// crisis keywords the mood check-in and VR companion already screen for.
 const CRISIS_KEYWORDS = [
   'suicid',
   'self-harm',
@@ -40,8 +54,8 @@ const CRISIS_KEYWORDS = [
   'no reason to live',
 ]
 
-// Same defense-in-depth principle as the VR companion: even with a
-// careful prompt, never trust the model's own reply blindly.
+// Defense in depth: even with a careful prompt, never trust the model's
+// own reply blindly.
 const BLOCKED_TERMS = [
   'diagnos',
   'disorder',
@@ -64,27 +78,7 @@ const BLOCKED_TERMS = [
   'patient',
 ]
 
-const SYSTEM_PROMPT = `You are a calm, supportive companion inside a mental well-being app called MonAndo.
-
-You are NOT a therapist, doctor, or counselor. Never claim or imply that role.
-
-Rules — follow all of these exactly, every time:
-- Never diagnose anything. Never use clinical or medical words (examples of
-  words you must never use: diagnosis, disorder, PTSD, symptom, condition,
-  panic attack, medication, treatment, therapy, therapist, doctor, clinical).
-- Never give medical or psychiatric advice.
-- Use the Socratic method: guide the person to reflect for themselves.
-  Never hand them a solution or tell them what to do.
-- Maximum ${MAX_WORDS} words. Warm, plain, simple, conversational language.
-- Follow this 4-round structure:
-  1. Greeting: warmly ask what's on their mind today.
-  2. Emotion: acknowledge what they shared, ask what emotions came up.
-  3. Solution: ask if they have past experience or their own ideas for
-     handling it — never suggest one yourself.
-  4. Summary: warmly reflect back what they shared. Do not ask a question
-     this round.
-- Every round except the Summary round must end with exactly ONE warm,
-  open question.`
+const MAX_WORDS = 30
 
 function sanitizeMessage(text) {
   if (!text || typeof text !== 'string') return null
@@ -95,44 +89,50 @@ function sanitizeMessage(text) {
   return text.trim()
 }
 
-function buildContents(history, round) {
-  const contents = [{ role: 'user', parts: [{ text: SYSTEM_PROMPT }] }]
+function buildMessages(history, round) {
+  const messages = [{ role: 'user', parts: [{ text: SYSTEM_PROMPT }] }]
   for (const msg of history) {
-    contents.push({
+    messages.push({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }],
     })
   }
-  const instruction =
-    round < TOTAL_ROUNDS - 1
-      ? `Continue as round "${ROUND_NAMES[round]}". End with one warm question.`
-      : `This is the Summary round. Warmly reflect back what they shared. Do not ask a question.`
-  contents.push({ role: 'user', parts: [{ text: instruction }] })
-  return contents
+  if (round < 3) {
+    messages.push({
+      role: 'user',
+      parts: [{ text: `Continue as round ${ROUND_NAMES[round]}. End with one question.` }],
+    })
+  } else {
+    messages.push({
+      role: 'user',
+      parts: [{ text: `Provide a warm summary of their insights. Close without a question.` }],
+    })
+  }
+  return messages
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed — use POST' })
+    res.status(405).json({ error: 'Method not allowed' })
     return
   }
 
   const { history, round } = req.body || {}
   if (!Array.isArray(history) || typeof round !== 'number') {
-    res.status(400).json({ error: 'Request body must include a history array and round number' })
+    res.status(400).json({ error: 'history array and round number are required' })
     return
   }
 
   const lastUserMessage = [...history].reverse().find((m) => m.role === 'user')?.content || ''
   const lowerLastMessage = lastUserMessage.toLowerCase()
   if (CRISIS_KEYWORDS.some((kw) => lowerLastMessage.includes(kw))) {
-    res.status(200).json({ message: null, round, done: false, flagged: true })
+    res.status(200).json({ ai_message: null, round, done: false, flagged: true })
     return
   }
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
-    res.status(500).json({ error: 'Server is missing GEMINI_API_KEY' })
+    res.status(500).json({ error: 'Missing GEMINI_API_KEY' })
     return
   }
 
@@ -141,25 +141,22 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: buildContents(history, round),
-        generationConfig: { maxOutputTokens: 200, temperature: 0.9 },
+        contents: buildMessages(history, round),
+        generationConfig: {
+          maxOutputTokens: 150,
+          temperature: 0.9,
+        },
       }),
     })
 
     const data = await upstream.json()
-
-    if (!upstream.ok) {
-      res.status(upstream.status).json({ error: data.error?.message || 'Gemini request failed' })
-      return
-    }
-
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
     const safeMessage = sanitizeMessage(raw) || "I'm here. Tell me a little more, whenever you're ready."
 
     res.status(200).json({
-      message: safeMessage,
+      ai_message: safeMessage,
       round: round + 1,
-      done: round >= TOTAL_ROUNDS - 1,
+      done: round >= 3,
       flagged: false,
     })
   } catch {

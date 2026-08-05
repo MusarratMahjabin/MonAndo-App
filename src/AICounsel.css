@@ -1,0 +1,216 @@
+/* src/AICounsel.css */
+.counsel-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(160deg, var(--welcome-bg-1) 0%, var(--welcome-bg-2) 55%, var(--welcome-bg-3) 100%);
+  background-size: cover;
+  background-position: center;
+}
+
+.counsel-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+}
+
+.counsel-header h2 {
+  color: white;
+  font-weight: 300;
+  margin: 0;
+}
+
+.counsel-back {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.counsel-chat {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.counsel-bubble {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 16px 20px;
+  margin: 6px 0;
+  max-width: 80%;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.counsel-bubble-user {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  align-self: flex-end;
+  border-radius: 20px 20px 4px 20px;
+}
+
+.counsel-bubble-ai {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  align-self: flex-start;
+  border-radius: 20px 20px 20px 4px;
+}
+
+.counsel-input-bar {
+  padding: 16px 24px calc(env(safe-area-inset-bottom, 0px) + 32px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 12px;
+}
+
+.counsel-input {
+  flex: 1;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.counsel-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.counsel-send-btn {
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.counsel-send-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.counsel-done-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 32px;
+  margin: 20px 24px;
+}
+
+.counsel-score-ring {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 32px;
+}
+
+.counsel-score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.counsel-score-number {
+  color: white;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.counsel-score-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+}
+
+.counsel-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.counsel-metric-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.counsel-metric-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.counsel-metric-value {
+  color: white;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.counsel-metric-main {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.counsel-metric-change {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.counsel-metric-change.positive {
+  color: #4ecdc4;
+}
+
+.counsel-metric-change.negative {
+  color: #ff6b6b;
+}
+
+.counsel-metric-sub {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.counsel-ok-btn {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
