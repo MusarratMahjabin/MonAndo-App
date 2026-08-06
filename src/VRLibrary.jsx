@@ -18,7 +18,8 @@ function BackChevron() {
 }
 
 function ScenarioCard({ scenario, onSelect }) {
-  const { title, category, difficulty, durationMinutes, emoji, thumbnailUrl } = scenario
+  const { title, category, difficulty, durationMinutes, emoji, thumbnailUrl, videoUrl } = scenario
+  const comingSoon = !videoUrl
 
   return (
     <button className="vrlib-card" type="button" onClick={() => onSelect(scenario)}>
@@ -29,9 +30,13 @@ function ScenarioCard({ scenario, onSelect }) {
           <div className="vrlib-thumb-fallback">{emoji}</div>
         )}
 
-        <span className={`vrlib-difficulty vrlib-difficulty-${difficulty.toLowerCase()}`}>
-          {difficulty.toUpperCase()}
-        </span>
+        {comingSoon ? (
+          <span className="vrlib-soon-badge">COMING SOON</span>
+        ) : (
+          <span className={`vrlib-difficulty vrlib-difficulty-${difficulty.toLowerCase()}`}>
+            {difficulty.toUpperCase()}
+          </span>
+        )}
         <span className="vrlib-duration">{durationMinutes} min</span>
 
         <div className="vrlib-thumb-caption">
@@ -42,7 +47,11 @@ function ScenarioCard({ scenario, onSelect }) {
 
       <div className="vrlib-footer">
         <span className="vrlib-category">{category}</span>
-        <span className="vrlib-status vrlib-status-start">→ Start</span>
+        {comingSoon ? (
+          <span className="vrlib-status vrlib-status-soon">Coming soon</span>
+        ) : (
+          <span className="vrlib-status vrlib-status-start">→ Start</span>
+        )}
       </div>
     </button>
   )

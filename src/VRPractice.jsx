@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import LoadingScreen from './LoadingScreen.jsx'
+import ComingSoon from './ComingSoon.jsx'
 
 // Lines are spoken this often, with a little natural variance rather than
 // a rigid, machine-precise beat.
@@ -392,22 +393,7 @@ function VRPractice({ scenario, mode, onExit, onFlagDistress }) {
   }
 
   if (!scenario.videoUrl) {
-    return (
-      <div className="vr-screen vr-missing">
-        <button className="vr-exit" type="button" onClick={onExit} aria-label="Exit VR Practice">
-          ✕
-        </button>
-        <div className="vr-missing-message">
-          <div className="vr-missing-emoji">{scenario.emoji}</div>
-          <p className="vr-missing-title">{scenario.title}</p>
-          <p>No video link has been added for this scenario yet.</p>
-          <p>
-            Paste a Cloudinary link into <code>videoUrl</code> for this
-            scenario in <code>src/scenarios.js</code>.
-          </p>
-        </div>
-      </div>
-    )
+    return <ComingSoon scenario={scenario} onBack={onExit} />
   }
 
   return (

@@ -323,40 +323,79 @@ body {
   font-weight: 600;
 }
 
-.vr-missing {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ---------- Coming Soon (scenario with no video yet) ---------- */
+
+.comingsoon-screen {
+  min-height: 100vh;
   background: var(--bg-app);
+  display: flex;
+  flex-direction: column;
 }
 
-.vr-missing-message {
-  max-width: 320px;
-  text-align: center;
-  color: var(--text-grey);
-  font-size: 14px;
-  line-height: 1.6;
-  padding: 0 24px;
+.comingsoon-hero {
+  position: relative;
+  height: 46vh;
+  min-height: 280px;
+  background-color: var(--navy);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
 }
 
-.vr-missing-emoji {
-  font-size: 40px;
+.comingsoon-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(17, 21, 38, 0.15) 0%, rgba(17, 21, 38, 0.88) 100%);
+}
+
+.comingsoon-badge {
+  position: relative;
+  align-self: flex-start;
+  background: var(--tile-terracotta);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  margin-top: calc(env(safe-area-inset-top, 0px) + 52px);
+}
+
+.comingsoon-hero-content {
+  position: relative;
+  margin-top: auto;
+}
+
+.comingsoon-emoji {
+  font-size: 32px;
+  display: block;
   margin-bottom: 6px;
 }
 
-.vr-missing-title {
+.comingsoon-title {
   font-family: var(--serif);
-  font-size: 20px;
-  color: var(--text-headline);
-  margin-bottom: 10px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
 }
 
-.vr-missing-message code {
-  background: rgba(27, 58, 92, 0.1);
-  color: var(--text-headline);
-  padding: 1px 6px;
-  border-radius: 6px;
-  font-size: 13px;
+.comingsoon-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 24px 100px;
+}
+
+.comingsoon-message {
+  max-width: 300px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-grey);
 }
 
 /* ---------- VR Therapy Library ---------- */
@@ -536,6 +575,19 @@ body {
   color: var(--badge-medium-text);
 }
 
+.vrlib-soon-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(17, 21, 38, 0.82);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
 .vrlib-difficulty-hard {
   background: var(--badge-hard-bg);
   color: var(--badge-hard-text);
@@ -595,6 +647,10 @@ body {
 
 .vrlib-status-start {
   color: var(--purple);
+}
+
+.vrlib-status-soon {
+  color: var(--text-grey);
 }
 
 .vrlib-status-completed {

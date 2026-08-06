@@ -127,6 +127,23 @@ const scenarios = [
       closing: 'You moved through it at your own pace. That matters.',
     },
   },
+  {
+    id: 'tong-tea-stall',
+    title: 'Tong (Tea Stall)',
+    category: 'Substance Use',
+    difficulty: 'Hard',
+    durationMinutes: 5,
+    moodTags: ['anxious', 'stressed', 'craving'],
+    emoji: '🚬',
+    thumbnailUrl: 'https://res.cloudinary.com/lszcugmx/image/upload/v1786027749/tong_ha3dog.webp',
+    videoUrl: null,
+    aiContext: 'The user is standing at a small roadside tea stall (tong), a familiar local spot where people often smoke while chatting, with ambient street chatter, passing traffic, and the smell and sight of cigarettes nearby. The scene is designed to trigger and help manage smoking urges in a safe, controlled setting.',
+    aiFallbackLines: {
+      opening: "You're here, and the urge might show up too. That's expected — you don't have to act on it.",
+      middle: 'The craving will peak and pass, like it always does. Just notice it, breathe, let it move through.',
+      closing: "You stood in a familiar trigger spot and didn't reach for one. That's real progress.",
+    },
+  },
 ]
 
 export default scenarios

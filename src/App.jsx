@@ -6,6 +6,7 @@ import AuthOptions from './AuthOptions.jsx'
 import ProfileSetup from './ProfileSetup.jsx'
 import Home from './Home.jsx'
 import VRLibrary from './VRLibrary.jsx'
+import ComingSoon from './ComingSoon.jsx'
 import HardwareSelect from './HardwareSelect.jsx'
 import PreCheck from './PreCheck.jsx'
 import VRPractice from './VRPractice.jsx'
@@ -232,6 +233,15 @@ function App() {
     )
   }
 
+  if (screen === 'comingsoon' && selectedScenario) {
+    return (
+      <>
+        <ComingSoon scenario={selectedScenario} onBack={() => setScreen('list')} />
+        <BottomNav current="list" onNavigate={setScreen} />
+      </>
+    )
+  }
+
   if (screen === 'list') {
     return (
       <>
@@ -239,7 +249,7 @@ function App() {
           onBack={() => setScreen('home')}
           onSelect={(scenario) => {
             setSelectedScenario(scenario)
-            setScreen('hardware')
+            setScreen(scenario.videoUrl ? 'hardware' : 'comingsoon')
           }}
         />
         <BottomNav current="list" onNavigate={setScreen} />
