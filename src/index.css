@@ -74,9 +74,21 @@ body {
   padding: 0 24px;
 }
 
+.home2-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .home2-topbar-logo {
   width: 36px;
   height: 36px;
+  object-fit: contain;
+}
+
+.home2-topbar-wordmark {
+  height: 18px;
+  width: auto;
   object-fit: contain;
 }
 

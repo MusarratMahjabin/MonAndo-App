@@ -12,16 +12,12 @@ function HomeIcon() {
   )
 }
 
-function SettingsIcon() {
+function VRIcon() {
   return (
     <svg width="21" height="21" viewBox="0 0 21 21" fill="none">
-      <circle cx="10.5" cy="10.5" r="2.6" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M10.5 3.5v2M10.5 15v2M17.5 10.5h-2M6 10.5H4M15.4 5.6l-1.4 1.4M7.5 13.4L6 15M15.4 15.4l-1.4-1.4M7.5 7.5L6 6"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
+      <rect x="2" y="7" width="17" height="9" rx="4.5" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="7.5" cy="11.5" r="1.3" fill="currentColor" />
+      <circle cx="13.5" cy="11.5" r="1.3" fill="currentColor" />
     </svg>
   )
 }
@@ -72,7 +68,7 @@ function ProfileIcon() {
 // never blend in with the rest.
 const TABS = [
   { id: 'home', label: 'Home', Icon: HomeIcon },
-  { id: 'settings', label: 'Settings', Icon: SettingsIcon },
+  { id: 'list', label: 'VR', Icon: VRIcon },
   { id: 'sos', label: 'SOS', Icon: SosIcon, isSos: true },
   { id: 'progress', label: 'Progress', Icon: ProgressIcon },
   { id: 'profileview', label: 'Profile', Icon: ProfileIcon },

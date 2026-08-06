@@ -43,7 +43,10 @@ function Home({
   return (
     <div className="home2-screen">
       <div className="home2-topbar">
-        <img className="home2-topbar-logo" src="/logo%20transparent.png" alt="MonAndo" />
+        <div className="home2-topbar-brand">
+          <img className="home2-topbar-logo" src="/logo%20transparent.png" alt="" />
+          <img className="home2-topbar-wordmark" src="/monando-wordmark.png" alt="MonAndo" />
+        </div>
         <button className="home2-topbar-menu" type="button" aria-label="Settings" onClick={onOpenSettings}>
           <HamburgerIcon />
         </button>
