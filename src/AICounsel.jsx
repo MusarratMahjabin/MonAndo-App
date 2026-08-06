@@ -81,12 +81,12 @@ function AICounsel({ onBack, onFlagDistress }) {
           <button className="counsel-back" type="button" onClick={onBack} aria-label="Back">
             ✕
           </button>
-          <h2>AI Counseling</h2>
+          <h2>Reflect</h2>
         </div>
 
         <div className="counsel-done-card">
           <h3 style={{ color: 'white', textAlign: 'center', fontWeight: 400, fontSize: '20px', marginBottom: '24px' }}>
-            Today's Counseling Done!
+            Today's Reflect Done!
           </h3>
 
           <div className="counsel-score-ring">
@@ -150,7 +150,7 @@ function AICounsel({ onBack, onFlagDistress }) {
         <button className="counsel-back" type="button" onClick={onBack} aria-label="Back">
           ✕
         </button>
-        <h2>AI Counseling</h2>
+        <h2>Reflect</h2>
       </div>
       <div className="counsel-chat">
         {history.map((msg, i) => (
